@@ -1,5 +1,0 @@
-"Resource: /home/nm/Documents/Programmation/IPLP/main.ml": "\161D\213\015\240\015\154\239H]X\210/^:\181"
-"Rule: ocaml: ml & cmi -> cmx & o (%=main )": "\208\186r\b\185\216\138<\197\017\026\239\237\166\163r"
-"Rule: ocaml: ml -> cmo & cmi (%=main )": "RL\240zi\154\179\246\026{\nH\199\146\131\224"
-"Rule: ocaml dependencies ml (%=main )": "\143\r\t\200AJ\247+\174\018DoF\031\234\176"
-"Rule: ocaml: cmx* & o* -> native (%=main )": "\203\164\145\213\212\162oK\155\192G\185\224\005X\003"
