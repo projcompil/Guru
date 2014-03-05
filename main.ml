@@ -24,7 +24,7 @@ let rec generep n k = match (n,k) with
 
 let rec calct pi = function
 	| [] -> 1.
-	| (w, p, eps)::l -> w /. pi *. (eps *. (calct (pi +. p) l) +. (1. -. eps) *. (calct pi l))
+	| (w, p, eps)::l -> w /. pi +. (eps *. (calct (pi +. p) l) +. (1. -. eps) *. (calct pi l))
 
 let rec associe l ens = match (l, ens) with
 	| [], _ | _, [] -> []
@@ -151,22 +151,23 @@ let rec affiche = function
 					affiche l;
 					end;;
 (* *)
-let n = (int_of_string(Sys.argv.(1))) in
 let taille = (Array.length Sys.argv) -1 in
-let l = genere n in
 	let p = float_of_int(2 + (Random.int 10)) in
 	(**)
-	let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) (int_of_string Sys.argv.(2)) (int_of_string Sys.argv.(3)) in
-		print_float a;
-		print_newline();
-		print_float b;
-		print_newline();
-		print_float c;
-		print_newline();
-		print_float mini;
-		print_newline();
-	(**.)(**)
-	let r = appheur l (if taille <= 4 then heuris1 3. 4. 3. else heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
+	if taille = 3 then
+		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) (int_of_string Sys.argv.(2)) (int_of_string Sys.argv.(3)) in
+			print_float a;
+			print_newline();
+			print_float b;
+			print_newline();
+			print_float c;
+			print_newline();
+			print_float mini;
+			print_newline();
+		(**)(**)
+	else let n = (int_of_string(Sys.argv.(1))) in
+		let l = genere n in
+		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
 		let (*a = calct p l and *) b = calct p r in
 		let (c,d) = naif l p in
 		print_newline();
@@ -192,4 +193,4 @@ let l = genere n in
 		print_float(100. *. ((b /. c) -. 1.));
 		print_newline();;
 		(**)
-(.**)
+(**)
