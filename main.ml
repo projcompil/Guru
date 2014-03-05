@@ -23,7 +23,7 @@ let rec generep n k = match (n,k) with
 	| n, k -> (List.map (aj 0) (generep (n-1) k)) @ (List.map (aj 1) (generep (n-1) (k-1)))
 
 let rec calct pi = function
-	| [] -> 1.
+	| [] -> 0.
 	| (w, p, eps)::l -> w /. pi +. (eps *. (calct (pi +. p) l) +. (1. -. eps) *. (calct pi l))
 
 let rec associe l ens = match (l, ens) with
