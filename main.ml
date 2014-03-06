@@ -139,6 +139,18 @@ let trouve_min_hyp t p m n =
 let teste p m n taille =
 	trouve_min_hyp (creet taille) p m n
 
+let rec calc_chemin_alea pi = function
+	| [] -> 0.
+	| (w, p, eps)::l -> let b = Random.int 2 in 
+							w /. pi +. (if b = 0 then eps *. (calc_chemin_alea (pi +. p) l) else (1. -. eps) *. (calc_chemin_alea pi l))
+
+let estime_moyenne m p l =
+	let r = ref 0. in
+		for i = 0 to m-1 do
+			r := !r +. (calc_chemin_alea p l) /. float_of_int(m)
+		done;
+		!r
+
 let rec affiche = function
 	| [] -> print_newline()
 	| (a,b,c)::l -> begin print_string "(";
@@ -154,7 +166,21 @@ let rec affiche = function
 let taille = (Array.length Sys.argv) -1 in
 	let p = float_of_int(2 + (Random.int 10)) in
 	(**)
-	if taille = 3 then
+	if taille = 2 then
+		let n = int_of_string Sys.argv.(1) in
+			let l = genere n in
+				let r = estime_moyenne (int_of_string Sys.argv.(2)) p l in begin
+					print_float(p);
+					print_newline();
+					affiche l;
+					print_newline();
+					print_float(r);
+					print_newline();
+					print_float(calct p l);
+					print_newline();
+					end
+
+	else if taille = 3 then
 		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) (int_of_string Sys.argv.(2)) (int_of_string Sys.argv.(3)) in
 			print_float a;
 			print_newline();
