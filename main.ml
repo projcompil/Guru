@@ -1,4 +1,3 @@
-
 Random.self_init()
 let nw = 30
 let np = 10
@@ -74,8 +73,6 @@ let naif l p =
 	let ll = permutation l in
 		minimum ll p
 
-let foi = float_of_int
-
 let creet n =
 	let t = Array.create n [|[||]|] in
 		for i = 0 to n-1 do
@@ -86,18 +83,17 @@ let creet n =
 				t.(i).(j) <- Array.create n (0., 0., 0.) ;
 			done
 		done;
-		let r = 1. /. foi(n) in
+		let r = 1. /. float_of_int(n) in
 			for i=0 to n-1 do
 				for j=0 to n-1 do
 					for k=0 to n-1 do
-						t.(i).(j).(k) <- (foi(i+1) *. r, foi(j+1) *.r, foi(k+1) *. r)
+						t.(i).(j).(k) <- (float_of_int(i+1) *. r, float_of_int(j+1) *.r, float_of_int(k+1) *. r)
 					done
 				done
 			done;
 			t
 
 let ecart l p a b c opti =
-	(*let (d,l) = naif l p in*)
 	let e = calct p (appheur l (heuris1 a b c)) in
 		(e /. opti ) -. 1.
 
@@ -152,14 +148,9 @@ let estime_moyenne m p l =
 
 let rec affiche = function
 	| [] -> print_newline()
-	| (a,b,c)::l -> begin print_string "(";
-					print_float a ;
-					print_string ", ";
-					print_float b ;
-					print_string ", ";
-					print_float c ;
-					print_string ") ";
-					affiche l;
+	| (a,b,c)::l -> begin 
+						Printf.printf "(%F, %F, %F) " a b c ;
+						affiche l;
 					end;;
 (* *)
 let taille = (Array.length Sys.argv) -1 in
@@ -168,54 +159,26 @@ let taille = (Array.length Sys.argv) -1 in
 	if taille = 2 then
 		let n = int_of_string Sys.argv.(1) in
 			let l = genere n in
-				let r = estime_moyenne (int_of_string Sys.argv.(2)) p l in begin
-					print_float(p);
-					print_newline();
-					affiche l;
-					print_newline();
-					print_float(r);
-					print_newline();
-					print_float(calct p l);
-					print_newline();
+			let ll =  (appheur l (heuris1 1.5 1. 1.5)) in
+				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in 
+					begin
+						print_float(p);
+						print_newline();
+						affiche ll;
+						let exact = calct p ll in Printf.printf "\n%F\n%F\nPourcentage : %F\n" r exact (100. *. (r /. exact -. 1.));
 					end
 
 	else if taille = 3 then
 		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) (int_of_string Sys.argv.(2)) (int_of_string Sys.argv.(3)) in
-			print_float a;
-			print_newline();
-			print_float b;
-			print_newline();
-			print_float c;
-			print_newline();
-			print_float mini;
-			print_newline();
-		(**)(**)
+			Printf.printf "%F\n%F\n%F\n\n%F\n" a b c mini ;
+	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
 		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
-		let (*a = calct p l and *) b = calct p r in
+		let b = calct p r in
 		let (c,d) = naif l p in
-		print_newline();
-		print_newline();
-		print_float p;
-		(*
-		print_newline();
-		affiche l ;
-		print_float a;
-		print_newline();
-		print_newline();
-		*)
-		print_newline();
-		affiche r ;
-		print_float b;
-		print_string("\n\n");
-		print_float(c);
-		print_newline();
-		affiche d;
-		print_newline();
-		print_newline();
-		print_newline();
-		print_float(100. *. ((b /. c) -. 1.));
-		print_newline();;
-		(**)
-(**)
+			Printf.printf "\n\nPuissance : %F\n" p ;
+			affiche r ;
+			Printf.printf "%F\n\n%F\n" b c ;
+			affiche d;
+			Printf.printf "\n\n\n%F\n" (100. *. ((b /. c) -. 1.));;
