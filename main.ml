@@ -141,8 +141,7 @@ let teste p m n taille =
 
 let rec calc_chemin_alea pi = function
 	| [] -> 0.
-	| (w, p, eps)::l -> let b = Random.int 2 in 
-							w /. pi +. (if b = 0 then eps *. (calc_chemin_alea (pi +. p) l) else (1. -. eps) *. (calc_chemin_alea pi l))
+	| (w, p, eps)::l -> w /. pi +. (if Random.float 1. <= eps then (calc_chemin_alea (pi +. p) l) else (calc_chemin_alea pi l))
 
 let estime_moyenne m p l =
 	let r = ref 0. in
