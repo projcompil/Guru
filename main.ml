@@ -169,8 +169,9 @@ let taille = (Array.length Sys.argv) -1 in
 					end
 
 	else if taille = 3 then
-		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) (int_of_string Sys.argv.(2)) (int_of_string Sys.argv.(3)) in
-			Printf.printf "%F\n%F\n%F\n\n%F\n" a b c mini ;
+		let n = int_of_string Sys.argv.(2) in
+		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) n (int_of_string Sys.argv.(3)) in
+			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
 	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
