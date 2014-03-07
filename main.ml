@@ -1,9 +1,20 @@
 Random.self_init()
-let nw = 30
-let np = 10
 
+(*
+
+a, b, et c : coefficients de l'heuristique
+w : temps pour convertir
+p : puissance du converti
+eps : probabilité de conversion
+
+*)
+let nw = 300 (* borne maximale sur les w *)
+let np = 100 (* idem sur les p *)
+
+(* generec[omputer] : génère un ordinateur *)
 let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
 
+(* génère un ensemble d'ordinateurs à attaquer *)
 let rec genere = function
 	| 0 -> []
 	| n -> generec()::(genere (n-1))
@@ -21,34 +32,38 @@ let rec generep n k = match (n,k) with
 	| n, k when n = k -> [(repete 1 k)]
 	| n, k -> (List.map (aj 0) (generep (n-1) k)) @ (List.map (aj 1) (generep (n-1) (k-1)))
 
+(* Fonction de calcul de l'espérance de temps d'un chemin *)
 let rec calct pi = function
 	| [] -> 0.
 	| (w, p, eps)::l -> w /. pi +. (eps *. (calct (pi +. p) l) +. (1. -. eps) *. (calct pi l))
+
 
 let rec associe l ens = match (l, ens) with
 	| [], _ | _, [] -> []
 	| a::l, 0::ens -> (associe l ens)
 	| a::l, _::ens -> a::(associe l ens)
 
+(* log en base 2 *)
 let lg x = log(x) /. log(2.)
 
+(* fonction de l'heuristique *)
 let heuris1 a b c (w,p, eps) =
 	-. a *. (lg (w)) +.  b *. (lg(p)) +. c *. (lg (eps))
 
 (*let heurisg1 t a b c  =
 	a(t) *.*)
 	
+(* fonction de comparaison à passer au tri *)	
 let cmp f a b =
 	if f a > f b then -1
 	else if f a < f b then 1 
 	else 0
 
+(* applique l'heuristique f à l *)
 let appheur l f =
 	List.sort (cmp f) l
 
-
-
-
+(* distribute et permutation permettent de créer la liste des permutations *)
 let distribute c l =
 	let rec insert acc1 acc2 = function
     	| [] -> acc2
@@ -59,6 +74,8 @@ let rec permutation = function
 	| [] -> [[]]
 	| hd::tl -> List.fold_left (fun acc x -> List.rev_append (distribute hd x) acc) [] (permutation tl)
 
+
+(* calcule le minimum des espérances de temps dans la liste l des permutations *)
 let minimum l p =
 	let rec aux (acc,m) = function
 		| [] -> (acc,m)
@@ -68,11 +85,11 @@ let minimum l p =
 					else aux (acc, m) l
 	in aux (-1.,[]) l
 
-
+(* algorithme naif appliqué à une instance *)
 let naif l p = 
 	let ll = permutation l in
 		minimum ll p
-
+(* crée un tableau de taille n sur n sur n pour tester différentes heuristiques *)
 let creet n =
 	let t = Array.create n [|[||]|] in
 		for i = 0 to n-1 do
@@ -92,25 +109,38 @@ let creet n =
 				done
 			done;
 			t
-
-let ecart l p a b c opti =
-	let e = calct p (appheur l (heuris1 a b c)) in
+(* écart entre opti et l'espérance donné par calcul sur la liste lk ordonnée selon l'heuristique *)
+let ecart l p a b c opti calcul =
+	let e = calcul p (appheur l (heuris1 a b c)) in
 		(e /. opti ) -. 1.
 
 let carre x = x *. x
 
-let rec app_sample s p a b c optimal = match s, optimal with
+(* applique l'heuristique et calcule la somme des écarts au carré sachant la liste "optimal" des solutions otpimales *)
+let rec app_sample s p a b c optimal calcul = match s, optimal with
 	| [], _ | _, [] -> 0.
-	| l::s, o::optimal -> carre(ecart l p a b c o) +. (app_sample s p a b c optimal)
+	| l::s, o::optimal -> carre(ecart l p a b c o calcul) +. (app_sample s p a b c optimal calcul)
 (*	List.fold_left (fun x l -> x +. (carre (ecart l p a b c))) 0. s*)
 	
 	
-
+(* génère un échantillon *)
 let rec genere_sample m = function
 	| 0 -> []
 	| n -> genere(m)::(genere_sample m (n-1))
 
+(* calcule le temps mis sur un chemin aléatoire *)
+let rec calc_chemin_alea pi = function
+	| [] -> 0.
+	| (w, p, eps)::l -> w /. pi +. (if Random.float 1. <= eps then (calc_chemin_alea (pi +. p) l) else (calc_chemin_alea pi l))
 
+(* fait la moyenne sur m calculs de chemins aléatoires *)
+let estime_moyenne m p l =
+	let r = ref 0. in
+		for i = 0 to m-1 do
+			r := !r +. (calc_chemin_alea p l) /. float_of_int(m)
+		done;
+		!r
+(* trouve l'hypothèse minimum sur les coefficients donnés par le tableau t, pour une puissance p, sur n listes de taille m*)
 let trouve_min_hyp t p m n =
 	let np = Array.length t in
 	let s = genere_sample m n in
@@ -120,7 +150,7 @@ let trouve_min_hyp t p m n =
 				for j=0 to np-1 do
 					for k=0 to np-1 do
 						let (at, bt, ct) = t.(i).(j).(k) in
-							let e = app_sample s p at bt ct optimal in
+							let e = app_sample s p at bt ct optimal calct  in
 								if (!mini < 0.) || (e < !mini) then begin
 									a := at;
 									b := bt;
@@ -135,26 +165,17 @@ let trouve_min_hyp t p m n =
 let teste p m n taille =
 	trouve_min_hyp (creet taille) p m n
 
-let rec calc_chemin_alea pi = function
-	| [] -> 0.
-	| (w, p, eps)::l -> w /. pi +. (if Random.float 1. <= eps then (calc_chemin_alea (pi +. p) l) else (calc_chemin_alea pi l))
-
-let estime_moyenne m p l =
-	let r = ref 0. in
-		for i = 0 to m-1 do
-			r := !r +. (calc_chemin_alea p l) /. float_of_int(m)
-		done;
-		!r
-
+(* affiche une instance *)
 let rec affiche = function
 	| [] -> print_newline()
 	| (a,b,c)::l -> begin 
 						Printf.printf "(%F, %F, %F) " a b c ;
 						affiche l;
 					end;;
-(* *)
+(* début du traitement des arguments*)
+
 let taille = (Array.length Sys.argv) -1 in
-	let p = float_of_int(2 + (Random.int 10)) in
+	let p = float_of_int(2 + (Random.int np)) in
 	(**)
 	if taille = 2 then
 		let n = int_of_string Sys.argv.(1) in
