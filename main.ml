@@ -37,11 +37,17 @@ let rec calct pi = function
 	| [] -> 0.
 	| (w, p, eps)::l -> w /. pi +. (eps *. (calct (pi +. p) l) +. (1. -. eps) *. (calct pi l))
 
+let rec calcd pi = function
+	| [] -> 0.
+	| (w,p, eps)::l -> w/.pi +. (calcd (pi +. p) l)
 
-let rec associe l ens = match (l, ens) with
+(* 0 pour l'ensemble, 1 pour le complémentaire *)
+let rec associe b l ens = match (l, ens) with
 	| [], _ | _, [] -> []
-	| a::l, 0::ens -> (associe l ens)
-	| a::l, _::ens -> a::(associe l ens)
+	| a::l, x::ens when x = b -> (associe b l ens)
+	| a::l, _::ens -> a::(associe b l ens)
+
+let rec resoutd pi l = ()
 
 (* log en base 2 *)
 let lg x = log(x) /. log(2.)
@@ -89,22 +95,24 @@ let minimum l p =
 let naif l p = 
 	let ll = permutation l in
 		minimum ll p
-(* crée un tableau de taille n sur n sur n pour tester différentes heuristiques *)
-let creet n =
+(* crée un tableau de taille n sur m sur l pour tester différentes heuristiques *)
+let creet n m l (c1, c2, c3) =
 	let t = Array.create n [|[||]|] in
 		for i = 0 to n-1 do
-			t.(i) <- Array.create n [||] ;
+			t.(i) <- Array.create m [||] ;
 		done;
 		for i = 0 to n-1 do
-			for j=0 to n-1 do
-				t.(i).(j) <- Array.create n (0., 0., 0.) ;
+			for j=0 to m-1 do
+				t.(i).(j) <- Array.create l (0., 0., 0.) ;
 			done
 		done;
-		let r = 1. /. float_of_int(n) in
+		let r1 = 1. /. float_of_int(n) in
+		let r2 = 1. /. float_of_int(m) in
+		let r3 = 1. /. float_of_int(l) in
 			for i=0 to n-1 do
-				for j=0 to n-1 do
-					for k=0 to n-1 do
-						t.(i).(j).(k) <- (float_of_int(i+1) *. r, float_of_int(j+1) *.r, float_of_int(k+1) *. r)
+				for j=0 to m-1 do
+					for k=0 to l-1 do
+						t.(i).(j).(k) <- (c1 +. float_of_int(i+1) *. r1, c2 +. float_of_int(j+1) *.r2, c3 +. float_of_int(k+1) *. r3)
 					done
 				done
 			done;
@@ -147,8 +155,8 @@ let trouve_min_hyp t p m n =
 	let optimal = List.map (fun l -> fst (naif l p)) s in
 		let a = ref 0. and b = ref 0. and c = ref 0. and mini = ref (-1.) in
 			for i=0 to np-1 do
-				for j=0 to np-1 do
-					for k=0 to np-1 do
+				for j=0 to Array.length(t.(i))-1 do
+					for k=0 to Array.length(t.(i).(j))-1 do
 						let (at, bt, ct) = t.(i).(j).(k) in
 							let e = app_sample s p at bt ct optimal calct  in
 								if (!mini < 0.) || (e < !mini) then begin
@@ -162,14 +170,14 @@ let trouve_min_hyp t p m n =
 			done;
 			(!a, !b, !c, !mini)
 
-let teste p m n taille =
-	trouve_min_hyp (creet taille) p m n
+let teste p m n taille1 taille2 taille3 (c1, c2, c3) =
+	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) p m n
 
 (* affiche une instance *)
 let rec affiche = function
 	| [] -> print_newline()
 	| (a,b,c)::l -> begin 
-						Printf.printf "(%F, %F, %F) " a b c ;
+						Printf.printf "(%F, %F, %F, %F) " a b c (a/.b) ;
 						affiche l;
 					end;;
 (* début du traitement des arguments*)
@@ -189,9 +197,9 @@ let taille = (Array.length Sys.argv) -1 in
 						let exact = calct p ll in Printf.printf "\n%F\n%F\nPourcentage : %F\n" r exact (100. *. (r /. exact -. 1.));
 					end
 
-	else if taille = 3 then
+	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
-		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) n (int_of_string Sys.argv.(3)) in
+		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) in
 			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
 	
 	else let n = (int_of_string(Sys.argv.(1))) in
