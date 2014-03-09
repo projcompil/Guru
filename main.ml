@@ -95,17 +95,21 @@ let minimum l p =
 let naif l p = 
 	let ll = permutation l in
 		minimum ll p
+
+let cree3d n m l x =
+	let t = Array.create n [|[||]|] in
+                for i = 0 to n-1 do
+                        t.(i) <- Array.create m [||] ;
+                done;
+                for i = 0 to n-1 do
+                        for j=0 to m-1 do
+                                t.(i).(j) <- Array.create l x ;
+                        done
+                done;
+		t
 (* crée un tableau de taille n sur m sur l pour tester différentes heuristiques *)
 let creet n m l (c1, c2, c3) =
-	let t = Array.create n [|[||]|] in
-		for i = 0 to n-1 do
-			t.(i) <- Array.create m [||] ;
-		done;
-		for i = 0 to n-1 do
-			for j=0 to m-1 do
-				t.(i).(j) <- Array.create l (0., 0., 0.) ;
-			done
-		done;
+	let t = cree3d n m l (0., 0., 0.) in 
 		let r1 = 1. /. float_of_int(n) in
 		let r2 = 1. /. float_of_int(m) in
 		let r3 = 1. /. float_of_int(l) in
@@ -153,22 +157,45 @@ let trouve_min_hyp t p m n =
 	let np = Array.length t in
 	let s = genere_sample m n in
 	let optimal = List.map (fun l -> fst (naif l p)) s in
-		let a = ref 0. and b = ref 0. and c = ref 0. and mini = ref (-1.) in
-			for i=0 to np-1 do
-				for j=0 to Array.length(t.(i))-1 do
-					for k=0 to Array.length(t.(i).(j))-1 do
-						let (at, bt, ct) = t.(i).(j).(k) in
-							let e = app_sample s p at bt ct optimal calct  in
-								if (!mini < 0.) || (e < !mini) then begin
-									a := at;
-									b := bt;
-									c := ct;
-									mini := e
-								end
+	let tab = cree3d np (Array.length t.(0)) (Array.length t.(0).(0)) 0. in
+		let rec aux liste opti = match liste, opti with
+			| [], _ | _, [] -> ()
+			| (l::liste), (o::opti) -> let h = Hashtbl.create m in
+					Hashtbl.add h [] 0. ;
+					for i=0 to np-1 do
+						for j=0 to Array.length(t.(i))-1 do
+							for k=0 to Array.length(t.(i).(j))-1 do
+                                                		let (at, bt, ct) = t.(i).(j).(k) in
+									let lt = appheur l (heuris1 at bt ct) in
+										if Hashtbl.mem h lt then
+											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
+										else let r = carre((calct p lt) /. o -. 1.) in 
+											begin
+												Hashtbl.add h lt r ;
+												tab.(i).(j).(k) <- tab.(i).(j).(k) +. r ;
+											end;
+							done;
+						done;
+					done;
+					aux liste opti ;
+		in
+			aux s optimal ;								
+			let im = ref 0 and jm = ref 0 and km = ref 0 and mini = ref tab.(0).(0).(0) in
+				for i=0 to np-1 do
+					for j=0 to Array.length(t.(i))-1 do
+						for k=0 to Array.length(t.(i).(j))-1 do
+								(*let e = app_sample s p at bt ct optimal calct  in*)
+							if tab.(i).(j).(k) < !mini then begin
+								im := i;
+								jm := j;
+								km := k;
+								mini := tab.(i).(j).(k)
+							end
+						done
 					done
-				done
-			done;
-			(!a, !b, !c, !mini)
+				done;
+			let (a,b,c) = t.(!im).(!jm).(!km) in 
+				(a, b, c, !mini)
 
 let teste p m n taille1 taille2 taille3 (c1, c2, c3) =
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) p m n
