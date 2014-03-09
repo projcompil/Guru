@@ -91,6 +91,88 @@ let minimum l p =
 					else aux (acc, m) l
 	in aux (-1.,[]) l
 
+
+module Val_etat = Map.Make( struct  type t= float let compare = compare end)
+
+type state = float*float Val_etat.t 
+ 
+type ordi = float*float*float
+ 
+type cible = ordi list
+
+ 
+ (*liste_des crÃ©er la liste des n entiers*)
+ let rec liste_des =function 
+	|0 -> []
+	|n -> (n-1)::(liste_des (n-1))
+ 
+(* make_choice l renvoit la liste des liste de longueur (longueur l)/2 elements de l*)
+let ajout_liste k l = List.map (fun (x,y)->(x,(k::y))) l 
+
+let rec adding i l=function
+	|[]->l 
+	|(a,b)::q->adding i (((i::a),b)::l) q
+
+let etape_choix t k i=
+	let t'=t in 
+		for j=(k-1) downto 0 do 
+			(t.(j+1) <- (ajout_liste i t.(j+1)));
+			let c =(adding i t.(j+1) t'.(j)) in t.(j+1) <- c
+				done;
+		t.(0) <- (ajout_liste i t.(0))
+
+let rec aux_choice t k = function
+	|[]->t.(k)
+	| a::q -> (etape_choix t k a);aux_choice t k q 
+
+let make_choice l = 
+	let t = (Array.make (((List.length l)/2)+1) [])
+	and k = (List.length l)/2 in
+	t.(0)<- [([],[])] ;
+	aux_choice t k l 
+
+	
+(*mix genere la liste de toute les permutations(tableaux) d'elements de la liste l *)
+let rec aux_mix1 k l =function
+	|[] -> l
+	|a::q -> aux_mix1 k ((k::a)::l) q 
+
+let rec aux_mix2 l =function 
+	|0 -> l
+	|p -> aux_mix2 (aux_mix1 p l l) (p-1)
+
+let mix l= aux_mix2 [l] (List.length l)
+
+
+(*sort renvoit le plus rapide (temps,etat) parmi une liste*)
+let rec sort = function
+	|[]->((float_of_int(max_int), Val_etat.empty),[])
+	| ((a,b),l)::q -> let ((c,d),l1)= (sort q) in if a<c then ((a,b),l) else ((c,d),l1)
+
+	
+(*ajoute et nouvel_etat font evoluer le graphe des etatsde 1 itÃ©rations*)
+let ajoute p (c,t) etat= 
+	if (Val_etat.mem p etat ) then (let (c1,t1)= (Val_etat.find p etat) in ( (Val_etat.add p (c +. c1,((c *. t) +. (c1 *. t1))) etat)))
+	else (Val_etat.add p (c,t) etat)
+
+let nouvel_etat etat (temps,pui,chance) =
+	Val_etat.fold (fun p (c,t) etat_acc -> ajoute (p +. pui) ((c *. chance), (t +. (temps /. p)))
+	(ajoute p ((c *. (1. -. chance)), (t +. (temps /. p))) etat_acc)) etat Val_etat.empty
+
+(*main_aux est la fonction clÃ© qui applique l'algo*)
+let rec main_aux  (tm,etat) = function
+	|[] -> ((tm,etat),[])
+	| [(temps,pui,chance)] -> let etat_n = (nouvel_etat etat (temps,pui,chance)) in (((Val_etat.fold (fun p (c,t)  s -> (s +. ( c *. t )))  etat_n 0.) , etat_n ),[(temps,pui,chance)])
+	|l->   (sort (List.map (fun (x,y) -> let ((tm_debut,etat_debut),chemin_debut)= (main_aux (tm,etat) x) in (let ((t,a),b)= (main_aux (tm_debut,etat_debut) y) in ((t,a),(chemin_debut@b))))
+		(make_choice l)))
+	
+(*guru_rapide est une simple application de main_aux Ã  l'Ã©tat de base *)
+let guru_rapide (env : cible) p = 
+		let ((tm,etat),chemin) = (main_aux (0., (Val_etat.singleton p (1.,0.))) env) in (tm,chemin)
+
+	
+		(*main est la fonction avec gÃ©nÃ©ration*)
+
 (* algorithme naif appliqué à une instance *)
 let naif l p = 
 	let ll = permutation l in
@@ -234,8 +316,10 @@ let taille = (Array.length Sys.argv) -1 in
 		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
 		let b = calct p r in
 		let (c,d) = naif l p in
+		(*let (e,f) = guru_rapide l p in
+		let ce = calct p f in*)
 			Printf.printf "\n\nPuissance : %F\n" p ;
 			affiche r ;
-			Printf.printf "%F\n\n%F\n" b c ;
+			Printf.printf "%F\n\n%F\n" (* ce *) b  c ;
 			affiche d;
-			Printf.printf "\n\n\n%F\n" (100. *. ((b /. c) -. 1.));;
+			Printf.printf "\n\n\n%F\n" (100. *. (((*ce*)b  /. c) -. 1.));;
