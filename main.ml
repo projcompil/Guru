@@ -286,7 +286,7 @@ let teste p m n taille1 taille2 taille3 (c1, c2, c3) =
 let rec affiche = function
 	| [] -> print_newline()
 	| (a,b,c)::l -> begin 
-						Printf.printf "(%F, %F, %F, %F) " a b c (a/.b) ;
+						Printf.printf "(%F, %F, %F, %F) " a b c (b /. a) ;
 						affiche l;
 					end;;
 (* début du traitement des arguments*)
@@ -309,7 +309,7 @@ let taille = (Array.length Sys.argv) -1 in
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
 		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) in
-			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
+			Printf.printf "Puissance : %F\n\n%F\n%F\n%F\n\nécart type en pourcent : %F\n" p a b c (100. *. sqrt(mini /. float_of_int(n))) ;
 	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
