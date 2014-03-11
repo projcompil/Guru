@@ -40,7 +40,32 @@ let rec calct pi = function
 let rec calcd pi = function
 	| [] -> 0.
 	| (w,p, eps)::l -> w/.pi +. (calcd (pi +. p) l)
+(*
+let rec divise = function
+	| [] -> [], []
+	| [x] -> [x], []
+	| x::y::l -> let (l1, l2) = divise l in (x::l1, y::l2)
 
+let rec fusion l1 l2 pi = match (l1, l2) with
+	| [], [] -> [], pi
+	| (w, p, eps)::l1, [] | [], (w, p, eps)::l1 -> let (l, pr) = fusion l1 [] (p +. pi) in
+								((w, p, eps)::l), pr
+	| ((w1, p1, eps1)::l1) , ((w2, p2, (eps2)::l2) -> if (w1 -. w2) /. pi +. w2 /. (pi +. p1) -. w1 /. (pi +. p2) < 0. then
+												let (l, pr) = fusion l1 ((w2, p2, eps2)::l2) (pi +. p1) in
+													((w1, p1, eps1)::l1), pr
+												else let (l, pr) = fusion ((w1, p1, eps1)::l1) l2 (pi +. p2) in
+													((w2, p2, eps2)::l1), pr
+let rec trifusion pi = function
+	| [] -> [], pi 
+	| [(w, p, eps)] -> [(w, p, eps)], (pi +. p)
+	| l -> let (l1, l2) = divise l in
+			let (l1r, p1r) = trifusion pi l1 in
+				let (l2r, p2r) = trifusion pi l2 in
+					fusion l1r l2r pi
+
+type fllist = (float * float * float) list
+let sold (l : fllist ) pi = fst (trifusion pi l)
+*)
 (* 0 pour l'ensemble, 1 pour le complémentaire *)
 let rec associe b l ens = match (l, ens) with
 	| [], _ | _, [] -> []
@@ -220,7 +245,7 @@ let rec app_sample s p a b c optimal calcul = match s, optimal with
 (* génère un échantillon *)
 let rec genere_sample m = function
 	| 0 -> []
-	| n -> genere(m)::(genere_sample m (n-1))
+	| n -> (float_of_int(2 + Random.int(np)), genere(m))::(genere_sample m (n-1))
 
 (* calcule le temps mis sur un chemin aléatoire *)
 let rec calc_chemin_alea pi = function
@@ -235,14 +260,14 @@ let estime_moyenne m p l =
 		done;
 		!r
 (* trouve l'hypothèse minimum sur les coefficients donnés par le tableau t, pour une puissance p, sur n listes de taille m*)
-let trouve_min_hyp t p m n =
+let trouve_min_hyp t m n resol calcul =
 	let np = Array.length t in
 	let s = genere_sample m n in
-	let optimal = List.map (fun l -> fst (naif l p)) s in
+	let optimal = List.map (fun (p,l) -> fst (resol l p)) s in
 	let tab = cree3d np (Array.length t.(0)) (Array.length t.(0).(0)) 0. in
 		let rec aux liste opti = match liste, opti with
 			| [], _ | _, [] -> ()
-			| (l::liste), (o::opti) -> let h = Hashtbl.create m in
+			| ((p,l)::liste), (o::opti) -> let h = Hashtbl.create m in
 					Hashtbl.add h [] 0. ;
 					for i=0 to np-1 do
 						for j=0 to Array.length(t.(i))-1 do
@@ -251,7 +276,7 @@ let trouve_min_hyp t p m n =
 									let lt = appheur l (heuris1 at bt ct) in
 										if Hashtbl.mem h lt then
 											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
-										else let r = carre((calct p lt) /. o -. 1.) in 
+										else let r = carre((calcul p lt) /. o -. 1.) in 
 											begin
 												Hashtbl.add h lt r ;
 												tab.(i).(j).(k) <- tab.(i).(j).(k) +. r ;
@@ -279,14 +304,14 @@ let trouve_min_hyp t p m n =
 			let (a,b,c) = t.(!im).(!jm).(!km) in 
 				(a, b, c, !mini)
 
-let teste p m n taille1 taille2 taille3 (c1, c2, c3) =
-	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) p m n
+let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
+	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
 
 (* affiche une instance *)
 let rec affiche = function
 	| [] -> print_newline()
 	| (a,b,c)::l -> begin 
-						Printf.printf "(%F, %F, %F, %F) " a b c (b /. a) ;
+						Printf.printf "(%F, %F, %F, %F) " a b c (c *. b /. a) ;
 						affiche l;
 					end;;
 (* début du traitement des arguments*)
@@ -294,22 +319,27 @@ let rec affiche = function
 let taille = (Array.length Sys.argv) -1 in
 	let p = float_of_int(2 + (Random.int np)) in
 	(**)
-	if taille = 2 then
+	if taille = 1 then
 		let n = int_of_string Sys.argv.(1) in
 			let l = genere n in
-			let ll =  (appheur l (heuris1 1.5 1. 1.5)) in
-				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in 
+			(*let ll =  (apph(int_of_string Sys.argv.(1))eur l (heuris1 1.5 1. 1.5)) in
+				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in *)
+				let llapp = snd(guru_rapide l p) in
+				let (exact, ll) = naif l p in
+				let cllapp = calct p llapp in
 					begin
 						print_float(p);
 						print_newline();
+						affiche llapp;
 						affiche ll;
-						let exact = calct p ll in Printf.printf "\n%F\n%F\nPourcentage : %F\n" r exact (100. *. (r /. exact -. 1.));
+						(*let exact = calct p ll in *) Printf.printf "\n%F\n%F\nPourcentage : %F\n" (*r*) cllapp  exact (100. *. (cllapp /. exact -. 1.));
 					end
 
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
-		let (a,b,c, mini) = teste p (int_of_string Sys.argv.(1)) n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) in
-			Printf.printf "Puissance : %F\n\n%F\n%F\n%F\n\nécart type en pourcent : %F\n" p a b c (100. *. sqrt(mini /. float_of_int(n))) ;
+		let m = int_of_string Sys.argv.(1) in
+		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
+			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
 	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
