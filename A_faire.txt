@@ -10,4 +10,7 @@ Pourrait-on rajouter une estimation de la puissance actuelle dans l'heuristique 
 ou simplement puissance initiale.
 Essayer d'autres heuristiques.
 
+
+Essayer de comparer les termes via expérience aléatoire -> algo en n^2 : le comparer avec l'heuristique de base.
+
 D'autres idées ?

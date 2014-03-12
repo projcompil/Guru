@@ -40,6 +40,27 @@ let rec calct pi = function
 let rec calcd pi = function
 	| [] -> 0.
 	| (w,p, eps)::l -> w/.pi +. (calcd (pi +. p) l)
+
+let compared pi (w1, p1, eps1) (w2, p2, eps2) =
+	w1 /. pi +. w2 /. ( pi +. p1 ) < w2 /. pi +. w1 /. ( pi +. p2 )
+		
+
+let rec minid pi l = match l with
+	| [] -> failwith "Minid d'une liste vide."
+	| [x] -> x, []
+	| x::l -> let y, lr = minid pi l in
+								if compared pi x y then
+									x, (y::lr)
+								else y, (x::lr)
+
+let rec trid pi l = match l with
+	| [] | [_] -> l
+	| l -> let ((w,p,eps), lr) = minid pi l in
+				(w, p, eps)::(trid (pi +. p) lr)
+
+let sold l pi =
+	let lr = trid pi l in
+		(calcd pi l), lr
 (*
 let rec divise = function
 	| [] -> [], []
