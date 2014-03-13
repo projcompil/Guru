@@ -54,13 +54,13 @@ let rec minid pi l = match l with
 									x, (y::lr)
 								else y, (x::lr)
 
-let rec trid pi l = match l with
+let rec trid l pi = match l with
 	| [] | [_] -> l
 	| l -> let ((w,p,eps), lr) = minid pi l in
-				(w, p, eps)::(trid (pi +. eps *. p) lr)
+				(w, p, eps)::(trid lr (pi +. eps *. p))
 
 let sold l pi =
-	let lr = trid pi l in
+	let lr = trid l pi in
 		(calcd pi l), lr
 (*
 let rec divise = function
@@ -266,9 +266,12 @@ let rec app_sample s p a b c optimal calcul = match s, optimal with
 	
 	
 (* génère un échantillon *)
+
+let genere_tout m = (float_of_int(2 + Random.int(np)), genere(m))
+
 let rec genere_sample m = function
 	| 0 -> []
-	| n -> (float_of_int(2 + Random.int(np)), genere(m))::(genere_sample m (n-1))
+	| n -> (genere_tout m)::(genere_sample m (n-1))
 
 (* calcule le temps mis sur un chemin aléatoire *)
 let rec calc_chemin_alea pi = function
@@ -283,7 +286,7 @@ let estime_moyenne m p l =
 		done;
 		!r
 (* trouve l'hypothèse minimum sur les coefficients donnés par le tableau t, pour une puissance p, sur n listes de taille m*)
-let trouve_min_hyp t m n resol calcul =
+(*let trouve_min_hyp t m n resol calcul =
 	let np = Array.length t in
 	let s = genere_sample m n in
 	let optimal = List.map (fun (p,l) -> fst (resol l p)) s in
@@ -338,6 +341,17 @@ let trouve_min_hyp t m n resol calcul =
 let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
 
+*)
+let testeun m n resol approx calcul =
+        let rec aux n acc = match n with
+                | 0 -> acc
+                | n -> let (p,l) = genere_tout m in
+                                let optimal = fst(resol l p) in
+                                        let lt = approx l p in
+                                        let ct = calcul p lt in
+                                                aux (n-1) (acc +. carre(ct /. optimal -. 1.))
+        in aux n 0.
+
 (* affiche une instance *)
 let rec affiche = function
 	| [] -> print_newline()
@@ -365,13 +379,18 @@ let taille = (Array.length Sys.argv) -1 in
 						affiche ll;
 						(*let exact = calct p ll in *) Printf.printf "\n%F\n%F\nPourcentage : %F\n" (*r*) cllapp  exact (100. *. (cllapp /. exact -. 1.));
 					end
+        else if taille = 2 then
+                let n = int_of_string Sys.argv.(2) in
+		let m = int_of_string Sys.argv.(1) in
+                        Printf.printf "En pourcentage : %F\n" (100. *.
+                        sqrt((testeun m n naif trid calct)/. float_of_int(n)))
 
-	else if taille = 5 || taille = 8 then
+(*	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
 		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
 			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
-	
+*)	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
 		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
