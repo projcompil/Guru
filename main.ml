@@ -8,8 +8,8 @@ p : puissance du converti
 eps : probabilité de conversion
 
 *)
-let nw = 300 (* borne maximale sur les w *)
-let np = 100 (* idem sur les p *)
+let nw = 30000 (* borne maximale sur les w *)
+let np = 1000 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
 let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
@@ -42,7 +42,8 @@ let rec calcd pi = function
 	| (w,p, eps)::l -> w/.pi +. (calcd (pi +. p) l)
 
 let compared pi (w1, p1, eps1) (w2, p2, eps2) =
-	w1 /. pi +. w2 /. ( pi +. p1 ) < w2 /. pi +. w1 /. ( pi +. p2 )
+	w1 /. pi +. eps1 *. w2 /. ( pi +. p1 ) +. (1. -. eps1 ) *. w2 /. pi < w2
+        /. pi +. eps2 *. w1 /. ( pi +. p2 ) +.( 1. -. eps2 ) *. w1 /. pi
 		
 
 let rec minid pi l = match l with
@@ -56,7 +57,7 @@ let rec minid pi l = match l with
 let rec trid pi l = match l with
 	| [] | [_] -> l
 	| l -> let ((w,p,eps), lr) = minid pi l in
-				(w, p, eps)::(trid (pi +. p) lr)
+				(w, p, eps)::(trid (pi +. eps *. p) lr)
 
 let sold l pi =
 	let lr = trid pi l in
@@ -100,7 +101,8 @@ let lg x = log(x) /. log(2.)
 
 (* fonction de l'heuristique *)
 let heuris1 a b c (w,p, eps) =
-	-. a *. (lg (w)) +.  b *. (lg(p)) +. c *. (lg (eps))
+	-. a *. (lg (w (*/. float_of_int(nw)*))) +.  b *. (lg(p(*/.
+        float_of_int(np)*))) +. c *. (lg (eps))
 
 (*let heurisg1 t a b c  =
 	a(t) *.*)
@@ -294,7 +296,15 @@ let trouve_min_hyp t m n resol calcul =
 						for j=0 to Array.length(t.(i))-1 do
 							for k=0 to Array.length(t.(i).(j))-1 do
                                                 		let (at, bt, ct) = t.(i).(j).(k) in
-									let lt = appheur l (heuris1 at bt ct) in
+									let lt =
+                                                                                (*appheur
+                                                                                 * l
+                                                                                 * (heuris1
+                                                                                 * at
+                                                                                 * bt
+                                                                                 * ct)
+                                                                                 * *)
+          trid p l in
 										if Hashtbl.mem h lt then
 											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
 										else let r = carre((calcul p lt) /. o -. 1.) in 
@@ -345,7 +355,7 @@ let taille = (Array.length Sys.argv) -1 in
 			let l = genere n in
 			(*let ll =  (apph(int_of_string Sys.argv.(1))eur l (heuris1 1.5 1. 1.5)) in
 				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in *)
-				let llapp = snd(guru_rapide l p) in
+				let llapp = snd(sold l p) in
 				let (exact, ll) = naif l p in
 				let cllapp = calct p llapp in
 					begin
