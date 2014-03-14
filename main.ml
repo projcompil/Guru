@@ -286,7 +286,7 @@ let estime_moyenne m p l =
 		done;
 		!r
 (* trouve l'hypothèse minimum sur les coefficients donnés par le tableau t, pour une puissance p, sur n listes de taille m*)
-(*let trouve_min_hyp t m n resol calcul =
+let trouve_min_hyp t m n resol calcul =
 	let np = Array.length t in
 	let s = genere_sample m n in
 	let optimal = List.map (fun (p,l) -> fst (resol l p)) s in
@@ -299,15 +299,7 @@ let estime_moyenne m p l =
 						for j=0 to Array.length(t.(i))-1 do
 							for k=0 to Array.length(t.(i).(j))-1 do
                                                 		let (at, bt, ct) = t.(i).(j).(k) in
-									let lt =
-                                                                                (*appheur
-                                                                                 * l
-                                                                                 * (heuris1
-                                                                                 * at
-                                                                                 * bt
-                                                                                 * ct)
-                                                                                 * *)
-          trid p l in
+									let lt = appheur l (heuris1 at  bt  ct) in
 										if Hashtbl.mem h lt then
 											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
 										else let r = carre((calcul p lt) /. o -. 1.) in 
@@ -341,7 +333,6 @@ let estime_moyenne m p l =
 let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
 
-*)
 let testeun m n resol approx calcul =
         let rec aux n acc = match n with
                 | 0 -> acc
@@ -385,12 +376,12 @@ let taille = (Array.length Sys.argv) -1 in
                         Printf.printf "En pourcentage : %F\n" (100. *.
                         sqrt((testeun m n naif trid calct)/. float_of_int(n)))
 
-(*	else if taille = 5 || taille = 8 then
+	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
 		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
 			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
-*)	
+	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
 		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
