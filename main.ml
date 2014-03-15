@@ -8,8 +8,8 @@ p : puissance du converti
 eps : probabilité de conversion
 
 *)
-let nw = 30000 (* borne maximale sur les w *)
-let np = 1000 (* idem sur les p *)
+let nw = 300 (* borne maximale sur les w *)
+let np = 100 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
 let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
@@ -41,10 +41,16 @@ let rec calcd pi = function
 	| [] -> 0.
 	| (w,p, eps)::l -> w/.pi +. (calcd (pi +. p) l)
 
-let compared pi (w1, p1, eps1) (w2, p2, eps2) =
-	w1 /. pi +. eps1 *. w2 /. ( pi +. p1 ) +. (1. -. eps1 ) *. w2 /. pi < w2
+
+let valeurd pi (w1, p1, eps1) (w2, p2, eps2) =
+	 w1 /. pi +. eps1 *. w2 /. ( pi +. p1 ) +. (1. -. eps1 ) *. w2 /. pi 
+
+let compared pi x y  =
+	(valeurd pi x y) < (valeurd pi y x)
+(*	w1 /. pi +. eps1 *. w2 /. ( pi +. p1 ) +. (1. -. eps1 ) *. w2 /. pi < w2
         /. pi +. eps2 *. w1 /. ( pi +. p2 ) +.( 1. -. eps2 ) *. w1 /. pi
-		
+*)		
+
 
 let rec minid pi l = match l with
 	| [] -> failwith "Minid d'une liste vide."
@@ -62,6 +68,25 @@ let rec trid l pi = match l with
 let sold l pi =
 	let lr = trid l pi in
 		(calcd pi l), lr
+
+let construite f (w, p, eps) pi x y =
+	eps *. (f (pi +. p) x y) +. (1. -. eps) *. (f pi x y)
+
+let rec minie f pi = function
+	| [] -> failwith "Liste vide dans minie !"
+	| [x] -> x, []
+	| x::l -> let y, lr = minid pi l in
+			if (f pi x y) < (f pi y x) then
+				x, (y::lr)
+			else y, (x::lr)
+
+let trie liste pi =
+	let rec aux l f = match l with
+		| [] | [_] -> l
+		| l -> let (x, lr) = minie f pi l in
+				x::(aux lr (construite f x))
+	in aux liste valeurd
+
 (*
 let rec divise = function
 	| [] -> [], []
@@ -374,7 +399,7 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        sqrt((testeun m n naif trid calct)/. float_of_int(n)))
+                        sqrt((testeun m n naif trie calct)/. float_of_int(n)))
 
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
