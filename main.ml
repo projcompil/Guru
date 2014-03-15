@@ -67,7 +67,7 @@ let rec trid l pi = match l with
 
 let sold l pi =
 	let lr = trid l pi in
-		(calcd pi l), lr
+		(calct pi l), lr
 
 let construite f (w, p, eps) pi x y =
 	eps *. (f (pi +. p) x y) +. (1. -. eps) *. (f pi x y)
@@ -76,16 +76,21 @@ let rec minie f pi = function
 	| [] -> failwith "Liste vide dans minie !"
 	| [x] -> x, []
 	| x::l -> let y, lr = minid pi l in
-			if (f pi x y) < (f pi y x) then
+			if (f pi x y) <= (f pi y x) then
 				x, (y::lr)
 			else y, (x::lr)
 
 let trie liste pi =
-	let rec aux l f = match l with
+	let rec auxi l f = match l with
 		| [] | [_] -> l
 		| l -> let (x, lr) = minie f pi l in
-				x::(aux lr (construite f x))
-	in aux liste valeurd
+				x::(auxi lr (construite f x))
+	in auxi liste valeurd
+
+
+let sole l pi =
+	let lr = trie l pi in
+		(calct pi l), lr
 
 (*
 let rec divise = function
@@ -142,6 +147,9 @@ let cmp f a b =
 let appheur l f =
 	List.sort (cmp f) l
 
+let solheur l p a b c =
+	let lr = appheur l (heuris1 a b c) in
+		(calct p lr), lr
 (* distribute et permutation permettent de créer la liste des permutations *)
 let distribute c l =
 	let rec insert acc1 acc2 = function
@@ -385,8 +393,8 @@ let taille = (Array.length Sys.argv) -1 in
 			let l = genere n in
 			(*let ll =  (apph(int_of_string Sys.argv.(1))eur l (heuris1 1.5 1. 1.5)) in
 				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in *)
-				let llapp = snd(sold l p) in
-				let (exact, ll) = naif l p in
+				let llapp = trie l p (*snd(sold l p) *) in
+				let (exact, ll) =  naif l p (*solheur l p 1. 1. 1. *) in
 				let cllapp = calct p llapp in
 					begin
 						print_float(p);
