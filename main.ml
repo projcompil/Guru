@@ -8,8 +8,8 @@ p : puissance du converti
 eps : probabilité de conversion
 
 *)
-let nw = 30000 (* borne maximale sur les w *)
-let np = 1000 (* idem sur les p *)
+let nw = 3000 (* borne maximale sur les w *)
+let np = 100 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
 let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
