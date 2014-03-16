@@ -8,7 +8,8 @@ p : puissance du converti
 eps : probabilité de conversion
 
 *)
-let nw = 3000 (* borne maximale sur les w *)
+
+let nw = 300 (* borne maximale sur les w *)
 let np = 100 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
@@ -41,10 +42,16 @@ let rec calcd pi = function
 	| [] -> 0.
 	| (w,p, eps)::l -> w/.pi +. (calcd (pi +. p) l)
 
-let compared pi (w1, p1, eps1) (w2, p2, eps2) =
-	w1 /. pi +. eps1 *. w2 /. ( pi +. p1 ) +. (1. -. eps1 ) *. w2 /. pi < w2
+
+let valeurd pi (w1, p1, eps1) (w2, p2, eps2) =
+	 w1 /. pi +. eps1 *. w2 /. ( pi +. p1 ) +. (1. -. eps1 ) *. w2 /. pi 
+
+let compared pi x y  =
+	(valeurd pi x y) < (valeurd pi y x)
+(*	w1 /. pi +. eps1 *. w2 /. ( pi +. p1 ) +. (1. -. eps1 ) *. w2 /. pi < w2
         /. pi +. eps2 *. w1 /. ( pi +. p2 ) +.( 1. -. eps2 ) *. w1 /. pi
-		
+*)		
+
 
 let rec minid pi l = match l with
 	| [] -> failwith "Minid d'une liste vide."
@@ -61,7 +68,31 @@ let rec trid l pi = match l with
 
 let sold l pi =
 	let lr = trid l pi in
-		(calcd pi l), lr
+		(calct pi l), lr
+
+let construite f (w, p, eps) pi x y =
+	eps *. (f (pi +. p) x y) +. (1. -. eps) *. (f pi x y)
+
+let rec minie f pi = function
+	| [] -> failwith "Liste vide dans minie !"
+	| [x] -> x, []
+	| x::l -> let y, lr = minid pi l in
+			if (f pi x y) <= (f pi y x) then
+				x, (y::lr)
+			else y, (x::lr)
+
+let trie liste pi =
+	let rec auxi l f = match l with
+		| [] | [_] -> l
+		| l -> let (x, lr) = minie f pi l in
+				x::(auxi lr (construite f x))
+	in auxi liste valeurd
+
+
+let sole l pi =
+	let lr = trie l pi in
+		(calct pi l), lr
+
 (*
 let rec divise = function
 	| [] -> [], []
@@ -117,6 +148,9 @@ let cmp f a b =
 let appheur l f =
 	List.sort (cmp f) l
 
+let solheur l p a b c =
+	let lr = appheur l (heuris1 a b c) in
+		(calct p lr), lr
 (* distribute et permutation permettent de créer la liste des permutations *)
 let distribute c l =
 	let rec insert acc1 acc2 = function
@@ -286,7 +320,7 @@ let estime_moyenne m p l =
 		done;
 		!r
 (* trouve l'hypothèse minimum sur les coefficients donnés par le tableau t, pour une puissance p, sur n listes de taille m*)
-(*let trouve_min_hyp t m n resol calcul =
+let trouve_min_hyp t m n resol calcul =
 	let np = Array.length t in
 	let s = genere_sample m n in
 	let optimal = List.map (fun (p,l) -> fst (resol l p)) s in
@@ -299,15 +333,7 @@ let estime_moyenne m p l =
 						for j=0 to Array.length(t.(i))-1 do
 							for k=0 to Array.length(t.(i).(j))-1 do
                                                 		let (at, bt, ct) = t.(i).(j).(k) in
-									let lt =
-                                                                                (*appheur
-                                                                                 * l
-                                                                                 * (heuris1
-                                                                                 * at
-                                                                                 * bt
-                                                                                 * ct)
-                                                                                 * *)
-          trid p l in
+									let lt = appheur l (heuris1 at  bt  ct) in
 										if Hashtbl.mem h lt then
 											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
 										else let r = carre((calcul p lt) /. o -. 1.) in 
@@ -341,7 +367,6 @@ let estime_moyenne m p l =
 let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
 
-*)
 let testeun m n resol approx calcul =
         let rec aux n acc = match n with
                 | 0 -> acc
@@ -369,8 +394,8 @@ let taille = (Array.length Sys.argv) -1 in
 			let l = genere n in
 			(*let ll =  (apph(int_of_string Sys.argv.(1))eur l (heuris1 1.5 1. 1.5)) in
 				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in *)
-				let llapp = snd(sold l p) in
-				let (exact, ll) = naif l p in
+				let llapp = trie l p (*snd(sold l p) *) in
+				let (exact, ll) =  naif l p (*solheur l p 1. 1. 1. *) in
 				let cllapp = calct p llapp in
 					begin
 						print_float(p);
@@ -383,14 +408,14 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        sqrt((testeun m n naif trid calct)/. float_of_int(n)))
+                        sqrt((testeun m n naif trie calct)/. float_of_int(n)))
 
-(*	else if taille = 5 || taille = 8 then
+	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
 		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
 			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
-*)	
+	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
 		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
