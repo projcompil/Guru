@@ -70,24 +70,47 @@ let sold l pi =
 	let lr = trid l pi in
 		(calct pi l), lr
 
+let rec calcfin pi l = match l with
+	| [] | [_] -> 0.
+	| [x ; y ] -> valeurd pi x y
+	| (w, p, eps)::l -> eps *. (calcfin (pi +. p) l) +. (1. -. eps) *. (calcfin pi l)
+
 let construite f (w, p, eps) pi x y =
 	eps *. (f (pi +. p) x y) +. (1. -. eps) *. (f pi x y)
 
+(*
 let rec minie f pi = function
 	| [] -> failwith "Liste vide dans minie !"
 	| [x] -> x, []
-	| x::l -> let y, lr = minie f pi l in
+	| x::l -> let y, lr =
+			minie f pi l in
 			if (f pi x y) < (f pi y x) then
+				x, (y::lr)
+			else y, (x::lr)
+*)
+
+let rec minie pi ldebut = function
+	| [] -> failwith "Erreur dans minie"
+	| [x] -> x, []
+	| x::l -> let y, lr = minie pi ldebut l in
+			if (calcfin pi (List.rev (y::x::ldebut))) < (calcfin pi (List.rev (x::y::ldebut))) then
 				x, (y::lr)
 			else y, (x::lr)
 
 let trie liste pi =
-	let rec auxi l f = match l with
+	(* let rec auxi l f = match l with
 		| [] ->  []
 		| [x] -> [x]
 		| l -> let (x, lr) = minie f pi l in
 				x::(auxi lr (construite f x))
-	in auxi liste valeurd
+	
+	*)
+	let rec auxi l ld = match l with
+		| [] -> List.rev ld
+		| [x] -> List.rev (x::ld)
+		| l -> let x, lr = minie pi ld l in
+				auxi lr (x::ld)
+	in auxi liste []
 
 
 let sole l pi =
@@ -291,7 +314,7 @@ let ecart l p a b c opti calcul =
 	let e = calcul p (appheur l (heuris1 a b c)) in
 		(e /. opti ) -. 1.
 
-let carre x = x *. x
+let carre x = (* x *. x *) x
 
 (* applique l'heuristique et calcule la somme des écarts au carré sachant la liste "optimal" des solutions otpimales *)
 let rec app_sample s p a b c optimal calcul = match s, optimal with
