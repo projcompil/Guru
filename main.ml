@@ -88,7 +88,7 @@ let rec minie f pi = function
 				x, (y::lr)
 			else y, (x::lr)
 *)
-
+(* il faut essayer toutes les paires !!! *)
 let rec minie pi ldebut = function
 	| [] -> failwith "Erreur dans minie"
 	| [x] -> x, []
@@ -441,7 +441,7 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        sqrt((testeun m n naif trie calct)/. float_of_int(n)))
+                        (testeun m n  naif (*(fun l p -> solheur l p 1. 1. 1.)*) trie calct)/. float_of_int(n))
 
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
