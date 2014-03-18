@@ -103,8 +103,35 @@ let rec trif l pi = match l with
 	| l -> let (lr, br) = unepasse pi [] false l in
 		if br then lr
 		else (List.hd lr)::(trif (List.tl lr) pi)
-	
+let forall t =
+	let n = Array.length t in
+		let b = ref true and i = ref 0 in
+			while !b && !i < n do
+				b := t.(!i)
+			done;
+			!b
+let starm m =
+	let n = Array.length m in
+		let i = ref (-1) in
+		let j = ref 0 in
+			while !i = -1 && !j < n do
+				if forall m.(!j) then
+					i := !j ;
+			done;
+			!i
 
+let stargraphe pi ldebut l =
+	let t = Array.of_list l in
+	let n = Array.length t in
+		let g = Array.make_matrix n n false in
+			for i=0 to n-1 do
+				for j=0 to n-1 do
+					if (calcfin pi (List.rev (t.(i)::t.(j)::ldebut))) < (calcfin pi (List.rev (t.(j)::t.(i)::ldebut))) then
+						g.(i).(j) <- true
+					else g.(j).(i) <- true ;
+				done
+			done;
+			0
 (* il faut essayer toutes les paires et trouver la star du graphe !!! *)
 let rec minie pi ldebut = function
 	| [] -> failwith "Erreur dans minie"
