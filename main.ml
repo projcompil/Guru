@@ -88,7 +88,24 @@ let rec minie f pi = function
 				x, (y::lr)
 			else y, (x::lr)
 *)
-(* il faut essayer toutes les paires !!! *)
+
+let rec unepasse pi ldebut b = function
+	| [] -> [], b
+	| [x] -> [x], b
+	| x::y::l -> 	if (calcfin pi (List.rev (y::x::ldebut))) < (calcfin pi (List.rev (x::y::ldebut))) then
+				let (lr, br) = (unepasse pi (x::ldebut) b (y::l)) in
+					(x::lr), br
+			else let (lr, br) =  (unepasse pi (y::ldebut) true (x::l)) in
+				(y::lr), true
+
+let rec trif l pi = match l with
+	| [] | [_] -> l
+	| l -> let (lr, br) = unepasse pi [] false l in
+		if br then lr
+		else (List.hd lr)::(trif (List.tl lr) pi)
+	
+
+(* il faut essayer toutes les paires et trouver la star du graphe !!! *)
 let rec minie pi ldebut = function
 	| [] -> failwith "Erreur dans minie"
 	| [x] -> x, []
@@ -392,6 +409,7 @@ let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
 
 
+let trig l pi = (trif (appheur l (heuris1 1. 1. 1.)) pi)
 (* affiche une instance *)
 let rec affiche = function
 	| [] -> print_newline()
