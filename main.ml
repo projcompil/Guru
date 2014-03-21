@@ -13,7 +13,7 @@ let nw = 300 (* borne maximale sur les w *)
 let np = 100 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
-let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
+let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), (*Random.float 1.*)0.5)
 
 (* génère un ensemble d'ordinateurs à attaquer *)
 let rec genere = function
@@ -226,7 +226,7 @@ let rec resoutd pi l = ()
 let lg x = log(x) /. log(2.)
 
 (* fonction de l'heuristique *)
-let heuris1 a b c (w,p, eps) =
+let heuris1 pi a b c (w,p, eps) =
 	-. a *. (lg (w (*/. float_of_int(nw)*))) +.  b *. (lg(p(*/.
         float_of_int(np)*))) +. c *. (lg (eps))
 
@@ -244,7 +244,7 @@ let appheur l f =
 	List.sort (cmp f) l
 
 let solheur l p a b c =
-	let lr = appheur l (heuris1 a b c) in
+	let lr = appheur l (heuris1 p a b c) in
 		(calct p lr), lr
 (* distribute et permutation permettent de créer la liste des permutations *)
 let distribute c l =
@@ -382,7 +382,7 @@ let creet n m l (c1, c2, c3) =
 			t
 (* écart entre opti et l'espérance donné par calcul sur la liste lk ordonnée selon l'heuristique *)
 let ecart l p a b c opti calcul =
-	let e = calcul p (appheur l (heuris1 a b c)) in
+	let e = calcul p (appheur l (heuris1 p a b c)) in
 		(e /. opti ) -. 1.
 
 let carre x = (* x *. x *) x
@@ -420,7 +420,7 @@ let trouve_min_hyp t m n resol calcul =
 						for j=0 to Array.length(t.(i))-1 do
 							for k=0 to Array.length(t.(i).(j))-1 do
                                                 		let (at, bt, ct) = t.(i).(j).(k) in
-									let lt = appheur l (heuris1 at  bt  ct) in
+									let lt = appheur l (heuris1 p at  bt  ct) in
 										if Hashtbl.mem h lt then
 											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
 										else let r = carre((calcul p lt) /. o -. 1.) in 
@@ -455,10 +455,10 @@ let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
 
 
-let trig calcul l pi = (trif calcul (appheur l (heuris1 1. 1. 1.)) pi)
+let trig calcul l pi = (trif calcul (appheur l (heuris1 pi 1. 1. 1.)) pi)
 
 let solg calcul l pi =
-	let lr = (trif calcul (appheur l (heuris1 1. 1. 1.)) pi)
+	let lr = (trif calcul (appheur l (heuris1 pi 1. 1. 1.)) pi)
 		in (calct pi lr), l
 (* affiche une instance *)
 let rec affiche = function
@@ -514,12 +514,12 @@ let taille = (Array.length Sys.argv) -1 in
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
-		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) (sole calcfin)(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
+		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif (*sole calcfin*)(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
 			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. (*sqrt*)(mini /. float_of_int(n))) ;
 	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
-		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
+		let r = appheur l (heuris1 p (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
 		let b = calct p r in
 		let (c,d) = naif l p in
 		(*let (e,f) = guru_rapide l p in
