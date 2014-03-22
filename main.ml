@@ -8,11 +8,12 @@ p : puissance du converti
 eps : probabilité de conversion
 
 *)
+
 let nw = 300 (* borne maximale sur les w *)
 let np = 100 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
-let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
+let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), (*Random.float 1.*)0.5)
 
 (* génère un ensemble d'ordinateurs à attaquer *)
 let rec genere = function
@@ -36,6 +37,17 @@ let rec generep n k = match (n,k) with
 let rec calct pi = function
 	| [] -> 0.
 	| (w, p, eps)::l -> w /. pi +. (eps *. (calct (pi +. p) l) +. (1. -. eps) *. (calct pi l))
+
+
+
+(* fait la moyenne sur m calculs de chemins aléatoires *)
+let estime_moyenne calcul m p l  =
+	let r = ref 0. in
+		for i = 0 to m-1 do
+			r := !r +. (calcul p l) /. float_of_int(m)
+		done;
+		!r
+(* trouve l'hypothèse minimum sur les coefficients donnés par le tableau t, pour une puissance p, sur n listes de taille m*)
 
 let rec calcd pi = function
 	| [] -> 0.
@@ -69,27 +81,111 @@ let sold l pi =
 	let lr = trid l pi in
 		(calct pi l), lr
 
+(* essayer via échantillonnage *)
+let rec calcfin pi l = match l with
+	| [] | [_] -> 0.
+	| [x ; y ] -> valeurd pi x y
+	| (w, p, eps)::l -> eps *. (calcfin (pi +. p) l) +. (1. -. eps) *. (calcfin pi l)
+
+let rec calcfin_alea pi = function
+	| [] -> 0.
+	| (w, p, eps)::l -> (if Random.float 1. <= eps then (calcfin_alea (pi +. p) l) else (calcfin_alea pi l))
+
 let construite f (w, p, eps) pi x y =
 	eps *. (f (pi +. p) x y) +. (1. -. eps) *. (f pi x y)
 
+(*
 let rec minie f pi = function
 	| [] -> failwith "Liste vide dans minie !"
 	| [x] -> x, []
-	| x::l -> let y, lr = minid pi l in
-			if (f pi x y) <= (f pi y x) then
+	| x::l -> let y, lr =
+			minie f pi l in
+			if (f pi x y) < (f pi y x) then
+				x, (y::lr)
+			else y, (x::lr)
+*)
+
+let rec unepasse calcul pi ldebut b = function
+	| [] -> [], b
+	| [x] -> [x], b
+	| x::y::l -> 	if (calcfin pi (List.rev (y::x::ldebut))) < (calcfin pi (List.rev (x::y::ldebut))) then
+				let (lr, br) = (unepasse calcul pi (x::ldebut) b (y::l)) in
+					(x::lr), br
+			else let (lr, br) =  (unepasse calcul pi (y::ldebut) true (x::l)) in
+				(y::lr), true
+
+let rec trif calcul l pi = match l with
+	| [] | [_] -> l
+	| l -> let (lr, br) = unepasse calcul pi [] false l in
+		if br then lr
+		else (List.hd lr)::(trif calcul (List.tl lr) pi)
+let forall t =
+	let n = Array.length t in
+		let b = ref true and i = ref 0 in
+			while !b && !i < n do
+				b := t.(!i);
+				i := !i + 1;
+			done;
+			!b
+let starm m =
+	let n = Array.length m in
+		let i = ref (-1) in
+		let j = ref 0 in
+			while !i = -1 && !j < n do
+				if forall m.(!j) then
+					i := !j ;
+				j := !j + 1
+			done;
+			!i
+let extrait t i =
+	let n = Array.length t in
+		let rec aux j =
+			if j >= n then []
+			else if j = i then aux (j+1)
+			else t.(j)::(aux (j+1))
+		in aux 0
+
+let stargraphe calcul pi ldebut l =
+	let t = Array.of_list l in
+	let n = Array.length t in
+		let g = Array.make_matrix n n false in
+			for i=0 to n-1 do
+				for j=0 to n-1 do
+					if (calcul pi (List.rev (t.(i)::t.(j)::ldebut))) > (calcul pi (List.rev (t.(j)::t.(i)::ldebut))) then
+						g.(i).(j) <- true
+					else g.(j).(i) <- true ;
+				done
+			done;
+			let i = starm g in
+				let l = extrait t i in
+					t.(i), l
+(* il faut essayer toutes les paires et trouver la star du graphe !!! *)
+let rec minie pi ldebut = function
+	| [] -> failwith "Erreur dans minie"
+	| [x] -> x, []
+	| x::l -> let y, lr = minie pi ldebut l in
+			if (calcfin pi (List.rev (y::x::ldebut))) < (calcfin pi (List.rev (x::y::ldebut))) then
 				x, (y::lr)
 			else y, (x::lr)
 
-let trie liste pi =
-	let rec auxi l f = match l with
-		| [] | [_] -> l
+let trie calcm liste pi =
+	(* let rec auxi l f = match l with
+		| [] ->  []
+		| [x] -> [x]
 		| l -> let (x, lr) = minie f pi l in
 				x::(auxi lr (construite f x))
-	in auxi liste valeurd
+	
+	*)
+	let rec auxi l ld = match l with
+		| [] -> List.rev ld
+		| [x] -> List.rev (x::ld)
+		| l -> let x, lr = stargraphe calcm pi ld l(*minie pi ld l*) in
+				auxi lr (x::ld)
+	in auxi liste []
 
 
-let sole l pi =
-	let lr = trie l pi in
+let sole calcm l pi =
+	let lr = trie calcm l pi in
 		(calct pi l), lr
 
 (*
@@ -130,7 +226,7 @@ let rec resoutd pi l = ()
 let lg x = log(x) /. log(2.)
 
 (* fonction de l'heuristique *)
-let heuris1 a b c (w,p, eps) =
+let heuris1 pi a b c (w,p, eps) =
 	-. a *. (lg (w (*/. float_of_int(nw)*))) +.  b *. (lg(p(*/.
         float_of_int(np)*))) +. c *. (lg (eps))
 
@@ -148,7 +244,7 @@ let appheur l f =
 	List.sort (cmp f) l
 
 let solheur l p a b c =
-	let lr = appheur l (heuris1 a b c) in
+	let lr = appheur l (heuris1 p a b c) in
 		(calct p lr), lr
 (* distribute et permutation permettent de créer la liste des permutations *)
 let distribute c l =
@@ -182,7 +278,7 @@ type ordi = float*float*float
 type cible = ordi list
 
  
- (*liste_des crÃ©er la liste des n entiers*)
+ (*liste_des crÃ©er la liste des n-1 entiers*)
  let rec liste_des =function 
 	|0 -> []
 	|n -> (n-1)::(liste_des (n-1))
@@ -286,10 +382,10 @@ let creet n m l (c1, c2, c3) =
 			t
 (* écart entre opti et l'espérance donné par calcul sur la liste lk ordonnée selon l'heuristique *)
 let ecart l p a b c opti calcul =
-	let e = calcul p (appheur l (heuris1 a b c)) in
+	let e = calcul p (appheur l (heuris1 p a b c)) in
 		(e /. opti ) -. 1.
 
-let carre x = x
+let carre x = (* x *. x *) x
 
 (* applique l'heuristique et calcule la somme des écarts au carré sachant la liste "optimal" des solutions otpimales *)
 let rec app_sample s p a b c optimal calcul = match s, optimal with
@@ -311,14 +407,6 @@ let rec calc_chemin_alea pi = function
 	| [] -> 0.
 	| (w, p, eps)::l -> w /. pi +. (if Random.float 1. <= eps then (calc_chemin_alea (pi +. p) l) else (calc_chemin_alea pi l))
 
-(* fait la moyenne sur m calculs de chemins aléatoires *)
-let estime_moyenne m p l =
-	let r = ref 0. in
-		for i = 0 to m-1 do
-			r := !r +. (calc_chemin_alea p l) /. float_of_int(m)
-		done;
-		!r
-(* trouve l'hypothèse minimum sur les coefficients donnés par le tableau t, pour une puissance p, sur n listes de taille m*)
 let trouve_min_hyp t m n resol calcul =
 	let np = Array.length t in
 	let s = genere_sample m n in
@@ -332,7 +420,7 @@ let trouve_min_hyp t m n resol calcul =
 						for j=0 to Array.length(t.(i))-1 do
 							for k=0 to Array.length(t.(i).(j))-1 do
                                                 		let (at, bt, ct) = t.(i).(j).(k) in
-									let lt = appheur l (heuris1 at  bt  ct) in
+									let lt = appheur l (heuris1 p at  bt  ct) in
 										if Hashtbl.mem h lt then
 											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
 										else let r = carre((calcul p lt) /. o -. 1.) in 
@@ -366,16 +454,12 @@ let trouve_min_hyp t m n resol calcul =
 let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
 
-let testeun m n resol approx calcul =
-        let rec aux n acc = match n with
-                | 0 -> acc
-                | n -> let (p,l) = genere_tout m in
-                                let optimal = fst(resol l p) in
-                                        let lt = approx l p in
-                                        let ct = calcul p lt in
-                                                aux (n-1) (acc +. carre(ct /. optimal -. 1.))
-        in aux n 0.
 
+let trig calcul l pi = (trif calcul (appheur l (heuris1 pi 1. 1. 1.)) pi)
+
+let solg calcul l pi =
+	let lr = (trif calcul (appheur l (heuris1 pi 1. 1. 1.)) pi)
+		in (calct pi lr), l
 (* affiche une instance *)
 let rec affiche = function
 	| [] -> print_newline()
@@ -383,6 +467,24 @@ let rec affiche = function
 						Printf.printf "(%F, %F, %F, %F) " a b c (c *. b /. a) ;
 						affiche l;
 					end;;
+
+let testeun m n resol approx calcul =
+        let rec aux n acc = match n with
+                | 0 -> acc
+                | n -> let (p,l) = genere_tout m in
+                                let optimal,lr = (resol l p) in
+                                        let lt = approx l p in
+                                        let ct = calcul p lt in
+                                               	if ct <> optimal then
+							begin
+							affiche lr;
+							print_newline();
+							affiche lt;
+							Printf.printf "\n%F  ::: %F\n"  (ct -. optimal) (100. *.(ct /. optimal -. 1.));
+							end;
+						aux (n-1) (acc +. carre(ct /. optimal -. 1.))
+        in aux n 0.;;
+
 (* début du traitement des arguments*)
 
 let taille = (Array.length Sys.argv) -1 in
@@ -393,8 +495,8 @@ let taille = (Array.length Sys.argv) -1 in
 			let l = genere n in
 			(*let ll =  (apph(int_of_string Sys.argv.(1))eur l (heuris1 1.5 1. 1.5)) in
 				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in *)
-				let llapp = trie l p (*snd(sold l p) *) in
-				let (exact, ll) =  (* naif l p*) (*i*)solheur l p 1. 1. 1.(* *) in
+				let llapp = trie calcfin(*estime_moyenne calcfin_alea (n*n)*) l p (*snd(sold l p) *) in
+				let (exact, ll) =  naif l p (*solheur l p 1. 1. 1. *) in
 				let cllapp = calct p llapp in
 					begin
 						print_float(p);
@@ -407,17 +509,17 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        sqrt((testeun m n naif trie calct)/. float_of_int(n)))
+                        (testeun m n  naif (fun l p -> trie calcfin (*solheur l p 1. 1. 1.*) l p) (*fun l p -> appheur l (heuris1 1. 0.6666 1.)*) (*trie calcfin(*estime_moyenne calcfin_alea (100 * m*m)i*)) *)calct)/. float_of_int(n))
 
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
-		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
-			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. sqrt(mini /. float_of_int(n))) ;
+		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif (*sole calcfin*)(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
+			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. (*sqrt*)(mini /. float_of_int(n))) ;
 	
 	else let n = (int_of_string(Sys.argv.(1))) in
 		let l = genere n in
-		let r = appheur l (heuris1 (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
+		let r = appheur l (heuris1 p (float_of_string Sys.argv.(2)) (float_of_string Sys.argv.(3)) (float_of_string Sys.argv.(4))) in 
 		let b = calct p r in
 		let (c,d) = naif l p in
 		(*let (e,f) = guru_rapide l p in
