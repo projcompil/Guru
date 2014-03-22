@@ -289,7 +289,7 @@ let ecart l p a b c opti calcul =
 	let e = calcul p (appheur l (heuris1 a b c)) in
 		(e /. opti ) -. 1.
 
-let carre x = x *. x
+let carre x = x
 
 (* applique l'heuristique et calcule la somme des écarts au carré sachant la liste "optimal" des solutions otpimales *)
 let rec app_sample s p a b c optimal calcul = match s, optimal with
@@ -394,7 +394,7 @@ let taille = (Array.length Sys.argv) -1 in
 			(*let ll =  (apph(int_of_string Sys.argv.(1))eur l (heuris1 1.5 1. 1.5)) in
 				let r = estime_moyenne (int_of_string Sys.argv.(2)) p ll in *)
 				let llapp = trie l p (*snd(sold l p) *) in
-				let (exact, ll) =  naif l p (*solheur l p 1. 1. 1. *) in
+				let (exact, ll) =  (* naif l p*) (*i*)solheur l p 1. 1. 1.(* *) in
 				let cllapp = calct p llapp in
 					begin
 						print_float(p);
