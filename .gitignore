@@ -12,6 +12,10 @@
 *.swp
 *.*~
 *.log
+*.dvi
+*.pdf
+*.aux
+
 
 _build/
 guru
