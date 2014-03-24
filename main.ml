@@ -28,10 +28,10 @@ let rec repete x = function
 let aj a l = a::l
 
 let rec generep n k = match (n,k) with
-	| _, 0  -> [(repete 0 n)]
+	| _, 0  -> [(repete false n)]
 	| 0, _ -> [[]]
-	| n, k when n = k -> [(repete 1 k)]
-	| n, k -> (List.map (aj 0) (generep (n-1) k)) @ (List.map (aj 1) (generep (n-1) (k-1)))
+	| n, k when n = k -> [(repete true k)]
+	| n, k -> (List.map (aj false) (generep (n-1) k)) @ (List.map (aj true) (generep (n-1) (k-1)))
 
 (* Fonction de calcul de l'espérance de temps d'un chemin *)
 let rec calct pi = function
@@ -80,6 +80,12 @@ let rec trid l pi = match l with
 let sold l pi =
 	let lr = trid l pi in
 		(calct pi l), lr
+
+
+let rec calcfinal pi l = match l with
+	| [] -> 0.
+	| [(w, p, eps)] -> w /. pi
+	| (w, p, eps)::l -> eps *. (calcfinal (pi +. p) l) +. (1. -. eps) *. (calcfinal pi l)
 
 (* essayer via échantillonnage *)
 let rec calcfin pi l = match l with
@@ -215,11 +221,28 @@ type fllist = (float * float * float) list
 let sold (l : fllist ) pi = fst (trifusion pi l)
 *)
 (* 0 pour l'ensemble, 1 pour le complémentaire *)
-let rec associe b l ens = match (l, ens) with
-	| [], _ | _, [] -> []
-	| a::l, x::ens when x = b -> (associe b l ens)
-	| a::l, _::ens -> a::(associe b l ens)
+let rec associe l ens = match (l, ens) with
+	| [], _ | _, [] -> [], []
+	| x::l, y::ens -> let (a, b) = associe l ens in
+				if y then (x::a), b
+				else a, (x::b)
 
+let resout l pi =
+	let rec aux ldebut l = match l with
+		| [] -> 0., []
+		| [x] -> (calcfinal pi (ldebut @ [x])), [x]
+		| l -> let n = List.length l in
+			let r = n/2 in
+				let rec auxil liste (min, rmin) = match liste with
+					| [] -> (min, rmin)
+					| ens::liste -> let (ld, lf) = associe l ens in
+								let rd, rld = aux ldebut ld in
+								let rf, rlf = aux (ldebut @ rld) lf in
+									if rd +. rf < min || min = -1. then
+										auxil liste ((rd +. rf), (rld @ rlf))
+									else auxil liste (min, rmin)
+				in auxil (generep n r) (-1., [])
+	in aux [] l
 let rec resoutd pi l = ()
 
 (* log en base 2 *)
@@ -475,13 +498,13 @@ let testeun m n resol approx calcul =
                                 let optimal,lr = (resol l p) in
                                         let lt = approx l p in
                                         let ct = calcul p lt in
-                                               	if ct <> optimal then
+                                               	(*if ct <> optimal then
 							begin
 							affiche lr;
 							print_newline();
 							affiche lt;
 							Printf.printf "\n%F  ::: %F\n"  (ct -. optimal) (100. *.(ct /. optimal -. 1.));
-							end;
+							end;*)
 						aux (n-1) (acc +. carre(ct /. optimal -. 1.))
         in aux n 0.;;
 
@@ -509,7 +532,8 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        (testeun m n  naif (fun l p -> trie calcfin (*solheur l p 1. 1. 1.*) l p) (*fun l p -> appheur l (heuris1 1. 0.6666 1.)*) (*trie calcfin(*estime_moyenne calcfin_alea (100 * m*m)i*)) *)calct)/. float_of_int(n))
+                        (testeun m n  resout (*fun l p -> snd(resout l p)*) (*fun l p -> trie calcfin (*solheur l p 1. 1. 1.*) l p*) (fun l p -> appheur l (heuris1 0. 1. 0.6666 1.)) (*trie calcfin(*estime_moyenne calcfin_alea (100 * m*m)i*)) *)calct)/. float_of_int(n))
+
 
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
