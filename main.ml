@@ -9,8 +9,8 @@ eps : probabilité de conversion
 
 *)
 
-let nw = 300 (* borne maximale sur les w *)
-let np = 100 (* idem sur les p *)
+let nw = 30000 (* borne maximale sur les w *)
+let np = 1000 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
 let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), (*Random.float 1.*)0.5)
@@ -408,7 +408,9 @@ let ecart l p a b c opti calcul =
 	let e = calcul p (appheur l (heuris1 p a b c)) in
 		(e /. opti ) -. 1.
 
-let carre x = (* x *. x *) x
+let carre x =  x *. x
+let identite x = x
+let valabs x = if x >= 0. then x else -. x
 
 (* applique l'heuristique et calcule la somme des écarts au carré sachant la liste "optimal" des solutions otpimales *)
 let rec app_sample s p a b c optimal calcul = match s, optimal with
@@ -430,7 +432,7 @@ let rec calc_chemin_alea pi = function
 	| [] -> 0.
 	| (w, p, eps)::l -> w /. pi +. (if Random.float 1. <= eps then (calc_chemin_alea (pi +. p) l) else (calc_chemin_alea pi l))
 
-let trouve_min_hyp t m n resol calcul =
+let trouve_min_hyp t m n resol calcul ferreur =
 	let np = Array.length t in
 	let s = genere_sample m n in
 	let optimal = List.map (fun (p,l) -> fst (resol l p)) s in
@@ -446,7 +448,7 @@ let trouve_min_hyp t m n resol calcul =
 									let lt = appheur l (heuris1 p at  bt  ct) in
 										if Hashtbl.mem h lt then
 											tab.(i).(j).(k) <- tab.(i).(j).(k) +. (Hashtbl.find h lt)
-										else let r = carre((calcul p lt) /. o -. 1.) in 
+										else let r = ferreur((calcul p lt) /. o -. 1.) in 
 											begin
 												Hashtbl.add h lt r ;
 												tab.(i).(j).(k) <- tab.(i).(j).(k) +. r ;
@@ -474,8 +476,8 @@ let trouve_min_hyp t m n resol calcul =
 			let (a,b,c) = t.(!im).(!jm).(!km) in 
 				(a, b, c, !mini)
 
-let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul =
-	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul
+let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul ferreur=
+	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul ferreur
 
 
 let trig calcul l pi = (trif calcul (appheur l (heuris1 pi 1. 1. 1.)) pi)
@@ -491,7 +493,7 @@ let rec affiche = function
 						affiche l;
 					end;;
 
-let testeun m n resol approx calcul =
+let testeun m n resol approx calcul ferreur =
         let rec aux n acc = match n with
                 | 0 -> acc
                 | n -> let (p,l) = genere_tout m in
@@ -505,7 +507,7 @@ let testeun m n resol approx calcul =
 							affiche lt;
 							Printf.printf "\n%F  ::: %F\n"  (ct -. optimal) (100. *.(ct /. optimal -. 1.));
 							end;*)
-						aux (n-1) (acc +. carre(ct /. optimal -. 1.))
+						aux (n-1) (acc +. ferreur(ct /. optimal -. 1.))
         in aux n 0.;;
 
 (* début du traitement des arguments*)
@@ -532,13 +534,13 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        (testeun m n  resout (*fun l p -> snd(resout l p)*) (*fun l p -> trie calcfin (*solheur l p 1. 1. 1.*) l p*) (fun l p -> appheur l (heuris1 0. 1. 0.6666 1.)) (*trie calcfin(*estime_moyenne calcfin_alea (100 * m*m)i*)) *)calct)/. float_of_int(n))
+                        (testeun m n  resout (*fun l p -> snd(resout l p)*) (*fun l p -> trie calcfin (*solheur l p 1. 1. 1.*) l p*) (fun l p -> appheur l (heuris1 0. 1. 0.6666 1.)) (*trie calcfin(*estime_moyenne calcfin_alea (100 * m*m)i*)) *)calct identite)/. float_of_int(n))
 
 
 	else if taille = 5 || taille = 8 then
 		let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
-		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) naif (*sole calcfin*)(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct in
+		let (a,b,c, mini) = teste m n (int_of_string Sys.argv.(3)) (int_of_string Sys.argv.(4)) (int_of_string Sys.argv.(5)) (if taille = 5 then (0., 0., 0.) else ((float_of_string Sys.argv.(6)), (float_of_string Sys.argv.(7)), (float_of_string Sys.argv.(8)))) resout (*sole calcfin*)(* (fun l p -> let (pr, lr) = guru_rapide l p in ((calct p lr), lr))*) calct identite in
 			Printf.printf "%F\n%F\n%F\n\nécart type en pourcent : %F\n" a b c (100. *. (*sqrt*)(mini /. float_of_int(n))) ;
 	
 	else let n = (int_of_string(Sys.argv.(1))) in
