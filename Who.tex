@@ -368,11 +368,12 @@ The evolution of $\Delta_{\mbox{{\tiny det}}}$ is irregular because $\Delta_{\mb
 
 \subsection{Particular cases}
 	\subsubsection{Fixed powers}
-		Let's assume all $\pi_i$ are equal to $p$, then by sorting all computers according to $f(w,\varepsilon)=\frac{\varepsilon}{w}$ in decreasing order, we obtain the optimal solution.
+		Let's assume all $\pi_i$ are equal to $p$, then by sorting all computers according to $f(w,\varepsilon)=\frac{\varepsilon}{w}$ in decreasing order, we obtain the optimal solution. The complexity of this algorithm is obviously the complexity of an efficient sort, that is $O(n\log n)$.
 		\begin{proof}
 			
 		\end{proof}
-	\subsubsection{Probabilities equal to 1}
+	\subsubsection{All probabilities equal to 1}
+		If all the $\varepsilon_i$ are equal to $1$, then we are able to find the best solution in $O(n\log n)$, by a small modification of the merge sort. Given the power $A(t)$ at some step $t$ of the algorithm, we can compare two computers $x$ and $y$ by comparing $f(x,y) = f((w_x, p_x), (w_y, p_y)) = \frac{w_x}{A(t)} + \frac{w_y}{A(t) + p_y}$ and $f(y,x)$.
 \subsection{Computational Strategies}
 
 We did not find polynomial-time algorithms for computing $P_{\mbox{{\tiny op}}}$. However, as we will immediately see, the problem's complexity is (at most) exponential and not factorial.\smallskip
