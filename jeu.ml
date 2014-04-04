@@ -38,7 +38,7 @@ let actualiser_puissance () =
 	done;;
 
 (* Principe : si plusieurs joueurs veulent prendre la meme piece, ils se mettent en difficulté :
-	- course poursuite car le premier qui dépassera travail tentera sa chance en premier avec proba p, le second a donc une proba (1-p)p de l'avoire, le 3eme p(1-p)^2, etc... 
+	- course poursuite car le premier qui dépassera travail tentera sa chance en premier avec proba p, le second a donc une proba (1-p)p de l'avoir, le 3eme p(1-p)^2, etc... 
 	- si très proches (dépassent travail au meme tour), choix aléatoire homogène de celui qui tentera sa chance à ce tour, les autres perdent alors un tour *)
 
 let pick l = 
