@@ -366,6 +366,10 @@ $$\Delta_{\mbox{{\tiny det}}}(P)=\sum_{k=0}^{2^{n-1}-1}\prod_{j=0}^{n-2} \epsilo
 
 The evolution of $\Delta_{\mbox{{\tiny det}}}$ is irregular because $\Delta_{\mbox{{\tiny det}}}(P)$ does not depend on $\pi_{P(n)}$ and $\epsilon_{P(n)}$. Thus, swapping $\mathcal{V}_{P(n)}$ with some another $\mathcal{V}_{i\neq P(n)}$ replaces two formula parameters by new ones. This may cause radical variations in $\Delta$.\footnote{A (somewhat artificial) remedy would be to rectify the model and assume that after the last attack Alice needs to amortize the captured computational power to perform some constant computational task $w'$. We do not use this alternative definition here.}
 
+\subsection{Particular cases}
+	\subsubsection{Fixed powers}
+
+	\subsubsection{Probabilities equal to 1}
 \subsection{Computational Strategies}
 
 We did not find polynomial-time algorithms for computing $P_{\mbox{{\tiny op}}}$. However, as we will immediately see, the problem's complexity is (at most) exponential and not factorial.\smallskip
@@ -384,6 +388,13 @@ O(2^{2 n + c_2 \log_2 n- \frac{\log_2^2 n}4})=O(2^{2n})$$
 
 where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
 
+
+% 2^(3n -...) plutôt ?
+	\subsection{Heuristics}
+		A simple heuristic is to order the computers by a function of $w$, $\pi$ and $\varepsilon$. For example take $f(w, \pi, \varepsilon) = \frac{\pi\varepsilon}{w}$.
+		Ordering pairs.
+
+		Sampling paths.
 \section{An Experimental Observation}
 
 Can a $P_{\mbox{{\tiny op}}}^{n+1}$ be constructed by inserting $\mathcal{V}_{n+1}$ into $P_{\mbox{{\tiny op}}}^n$? It appears that such is frequently the case. This section provides experimental statistics about the ratio of configurations for which the insertion of $\mathcal{V}_5$ and $\mathcal{V}_6$ into a 4-target solution is possible.
@@ -412,7 +423,7 @@ It appears that for large $A$ the success ratio $r_A$ tends to one. We do not ha
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=10cm]{ordre.eps}
+%\includegraphics[width=10cm]{ordre.eps}
 \end{center}
 \caption{$\mbox{{\sf Experiment}}(100,100)$ (in red) and $\mbox{{\sf Experiment}}(50,200)$ (in blue). $r_A$ is the ratio of 6-target optimal plans obtainable by inserting 5 and 6 into their corresponding 4-target optimal plan.}
 \label{fig}

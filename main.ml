@@ -13,7 +13,7 @@ let nw = 30000 (* borne maximale sur les w *)
 let np = 1000 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
-let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), (*Random.float 1.*)0.5)
+let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
 
 (* génère un ensemble d'ordinateurs à attaquer *)
 let rec genere = function
@@ -92,6 +92,30 @@ let rec calcfin pi l = match l with
 	| [] | [_] -> 0.
 	| [x ; y ] -> valeurd pi x y
 	| (w, p, eps)::l -> eps *. (calcfin (pi +. p) l) +. (1. -. eps) *. (calcfin pi l)
+
+
+let rec associe l ens = match (l, ens) with
+	| [], _ | _, [] -> [], []
+	| x::l, y::ens -> let (a, b) = associe l ens in
+				if y then (x::a), b
+				else a, (x::b)
+
+let resout l pi =
+	let rec aux ldebut l = match l with
+		| [] -> 0., []
+		| [x] -> (calcfinal pi (ldebut @ [x])), [x]
+		| l -> let n = List.length l in
+			let r = n/2 in
+				let rec auxil liste (min, rmin) = match liste with
+					| [] -> (min, rmin)
+					| ens::liste -> let (ld, lf) = associe l ens in
+								let rd, rld = aux ldebut ld in
+								let rf, rlf = aux (ldebut @ rld) lf in
+									if rd +. rf < min || min = -1. then
+										auxil liste ((rd +. rf), (rld @ rlf))
+									else auxil liste (min, rmin)
+				in auxil (generep n r) (-1., [])
+	in aux [] l
 
 let rec calcfin_alea pi = function
 	| [] -> 0.
@@ -221,28 +245,7 @@ type fllist = (float * float * float) list
 let sold (l : fllist ) pi = fst (trifusion pi l)
 *)
 (* 0 pour l'ensemble, 1 pour le complémentaire *)
-let rec associe l ens = match (l, ens) with
-	| [], _ | _, [] -> [], []
-	| x::l, y::ens -> let (a, b) = associe l ens in
-				if y then (x::a), b
-				else a, (x::b)
 
-let resout l pi =
-	let rec aux ldebut l = match l with
-		| [] -> 0., []
-		| [x] -> (calcfinal pi (ldebut @ [x])), [x]
-		| l -> let n = List.length l in
-			let r = n/2 in
-				let rec auxil liste (min, rmin) = match liste with
-					| [] -> (min, rmin)
-					| ens::liste -> let (ld, lf) = associe l ens in
-								let rd, rld = aux ldebut ld in
-								let rf, rlf = aux (ldebut @ rld) lf in
-									if rd +. rf < min || min = -1. then
-										auxil liste ((rd +. rf), (rld @ rlf))
-									else auxil liste (min, rmin)
-				in auxil (generep n r) (-1., [])
-	in aux [] l
 let rec resoutd pi l = ()
 
 (* log en base 2 *)
@@ -480,7 +483,7 @@ let teste m n taille1 taille2 taille3 (c1, c2, c3) resol calcul ferreur=
 	trouve_min_hyp (creet taille1 taille2 taille3 (c1, c2, c3)) m n resol calcul ferreur
 
 
-let trig calcul l pi = (trif calcul (appheur l (heuris1 pi 1. 1. 1.)) pi)
+let trig calcul l pi = (trif calcul (appheur l (heuris1 pi 1. 0.5 1.)) pi)
 
 let solg calcul l pi =
 	let lr = (trif calcul (appheur l (heuris1 pi 1. 1. 1.)) pi)
@@ -534,7 +537,7 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        (testeun m n  resout (*fun l p -> snd(resout l p)*) (*fun l p -> trie calcfin (*solheur l p 1. 1. 1.*) l p*) (fun l p -> appheur l (heuris1 0. 1. 0.6666 1.)) (*trie calcfin(*estime_moyenne calcfin_alea (100 * m*m)i*)) *)calct identite)/. float_of_int(n))
+                        (testeun m n  resout (*fun l p -> snd(resout l p)*) (*fun l p -> trig calcfin l p (*appheur l (heuris1 5. 1. 1. 1.) *)*) (*fun l p -> appheur l (heuris1 0. 1. 1. 1.)*) (trig (estime_moyenne calcfin_alea (m*m))) calct identite)/. float_of_int(n))
 
 
 	else if taille = 5 || taille = 8 then
