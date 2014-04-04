@@ -87,13 +87,6 @@ let rec calcfinal pi l = match l with
 	| [(w, p, eps)] -> w /. pi
 	| (w, p, eps)::l -> eps *. (calcfinal (pi +. p) l) +. (1. -. eps) *. (calcfinal pi l)
 
-(* essayer via échantillonnage *)
-let rec calcfin pi l = match l with
-	| [] | [_] -> 0.
-	| [x ; y ] -> valeurd pi x y
-	| (w, p, eps)::l -> eps *. (calcfin (pi +. p) l) +. (1. -. eps) *. (calcfin pi l)
-
-
 let rec associe l ens = match (l, ens) with
 	| [], _ | _, [] -> [], []
 	| x::l, y::ens -> let (a, b) = associe l ens in
@@ -116,6 +109,12 @@ let resout l pi =
 									else auxil liste (min, rmin)
 				in auxil (generep n r) (-1., [])
 	in aux [] l
+
+(* essayer via échantillonnage *)
+let rec calcfin pi l = match l with
+	| [] | [_] -> 0.
+	| [x ; y ] -> valeurd pi x y
+	| (w, p, eps)::l -> eps *. (calcfin (pi +. p) l) +. (1. -. eps) *. (calcfin pi l)
 
 let rec calcfin_alea pi = function
 	| [] -> 0.
