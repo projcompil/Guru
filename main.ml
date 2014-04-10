@@ -252,8 +252,7 @@ let lg x = log(x) /. log(2.)
 
 (* fonction de l'heuristique *)
 let heuris1 pi a b c (w,p, eps) =
-	-. a *. (lg (w (*/. float_of_int(nw)*))) +.  b *. (lg(p(*/.
-        float_of_int(np)*))) +. c *. (lg (eps))
+	-. a *. (lg (w (*/. float_of_int(nw)*))) +.  b *. (lg(p/.(pi +. p))) +. c *. (lg (eps))
 
 (*let heurisg1 t a b c  =
 	a(t) *.*)
@@ -536,7 +535,7 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        (testeun m n  resout (*fun l p -> snd(resout l p)*) (*fun l p -> trig calcfin l p (*appheur l (heuris1 5. 1. 1. 1.) *)*) (*fun l p -> appheur l (heuris1 0. 1. 1. 1.)*) (trig (estime_moyenne calcfin_alea (m*m))) calct identite)/. float_of_int(n))
+                        (testeun m n  resout (*fun l p -> snd(resout l p)*) (*fun l p -> trig calcfin l p (*appheur l (heuris1 5. 1. 1. 1.) *)*) (fun l p -> appheur l (heuris1 p 1. 1. 1.)) (*trig (estime_moyenne calcfin_alea (m*m))*) calct identite)/. float_of_int(n))
 
 
 	else if taille = 5 || taille = 8 then
