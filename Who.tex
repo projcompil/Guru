@@ -406,7 +406,9 @@ where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
 		Thus it follows that : \[ \Delta( \{ i, j, \cdots \}) < \Delta( \{ j, i, \cdots \}) \Leftrightarrow \varepsilon_i w_j  \frac{\pi_i}{A + \pi_i} > \varepsilon_j w_i  \frac{\pi_j}{A + \pi_j} \Leftrightarrow \frac{\varepsilon_i \pi_i}{w_i(A + \pi_i)} >  \frac{\varepsilon_j \pi_j}{w_j(A + \pi_j)} \]
 		We can now order the computers according to the values (in decreasing order) of the function $f(A,w,\pi, \varepsilon) =\frac{\varepsilon \pi}{w(A + \pi)}$. Of course after the first step, we no longer have a fixed power, although we could take the mean of the values of $f$ on different branches. However keeping the initial power gives good approximation with the complexity of a sort.
 		This heuristics works well because we approximate a permutation of the computer which, albeit potentially suboptimal, is close to a permutation that is not improvable by any transposition of the form $(i\;\; i+1)$
+		
 
+		Actually it is possible to obtain a permutation of the computers that can't be improved by any transpotion of the form  $(i\;\; i+1)$, at the price of an increased complexity of $O(2^n)$. This highlights the difficulty of the problem, as it is possible to find instances where such an algorithm is stuck in a suboptimal solution.
 		Sampling paths.
 \section{An Experimental Observation}
 
