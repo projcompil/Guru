@@ -409,7 +409,8 @@ where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
 		
 
 		Actually it is possible to obtain a permutation of the computers that can't be improved by any transpotion of the form  $(i\;\; i+1)$, at the price of an increased complexity of $O(2^n)$. This highlights the difficulty of the problem, as it is possible to find instances where such an algorithm is stuck in a suboptimal solution.
-		Sampling paths.
+		
+		A simple way to achieve an approximation of the last algorithm, which is polynomial in time, is to take the mean across sampled paths.
 \section{An Experimental Observation}
 
 Can a $P_{\mbox{{\tiny op}}}^{n+1}$ be constructed by inserting $\mathcal{V}_{n+1}$ into $P_{\mbox{{\tiny op}}}^n$? It appears that such is frequently the case. This section provides experimental statistics about the ratio of configurations for which the insertion of $\mathcal{V}_5$ and $\mathcal{V}_6$ into a 4-target solution is possible.
@@ -434,7 +435,7 @@ Can a $P_{\mbox{{\tiny op}}}^{n+1}$ be constructed by inserting $\mathcal{V}_{n+
      \OD\\
 \end{program}
 
-It appears that for large $A$ the success ratio $r_A$ tends to one. We do not have an explanation of this observation. However, if true, this could yield a polynomial-time algorithm that outputs $P_{\mbox{{\tiny op}}}$ with high probability for large $A$ values.
+It appears that for large $A$ the success ratio $r_A$ tends to one. This phenomenon is arguably related to the fact that sorting the computers according %We do not have an explanation of this observation. However, if true, this could yield a polynomial-time algorithm that outputs $P_{\mbox{{\tiny op}}}$ with high probability for large $A$ values.
 
 \begin{figure}[!h]
 \begin{center}
