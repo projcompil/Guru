@@ -9,8 +9,8 @@ eps : probabilité de conversion
 
 *)
 
-let nw = 30000 (* borne maximale sur les w *)
-let np = 1000 (* idem sur les p *)
+let nw = 300000 (* borne maximale sur les w *)
+let np = 10000 (* idem sur les p *)
 
 (* generec[omputer] : génère un ordinateur *)
 let generec () = (float_of_int (2+ (Random.int nw)) , float_of_int (2 + (Random.int np)), Random.float 1.)
@@ -535,7 +535,7 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf "En pourcentage : %F\n" (100. *.
-                        (testeun m n  (resout) (*fun l p -> solheur l p 1. 1. 1.*) (*fun l p -> snd(resout l p)*) (*fun l p -> trig calcfin l p (*appheur l (heuris1 5. 1. 1. 1.) *)*) (fun l p -> appheur l (heuris1 p 1. 1. 1.)) (*trig (estime_moyenne calcfin_alea (m*m))*) calct identite)/. float_of_int(n))
+                        (testeun m n  (resout) (*fun l p -> solheur l p 1. 1. 1.*) (*fun l p -> snd(resout l p)*) (*fun l p -> trig calcfin l p*) (fun l p -> appheur l (heuris1 p 1. 1. 1.)) (*trig (estime_moyenne calcfin_alea (m*m))*) calct identite)/. float_of_int(n))
 
 
 	else if taille = 5 || taille = 8 then

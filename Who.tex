@@ -386,9 +386,9 @@ Let $n=2k$ and let $P_{\mbox{{\tiny op}}}^{2k}$ be the optimal plan for attackin
 
 In other words, if the cost of finding $P_{\mbox{{\tiny op}}}^{2k}$ is $f(n)$ then, denoting $n=2^a$:
 
-$$f(n)= \binom{n}{n/2} \times 2 f(\frac{n}2)
+$$f(n)= \binom{n}{n/2} \times (1+2^{n/2}) f(\frac{n}2)
 = \frac{2^a n! f(1)}{\prod_{i=1}^{a-1}(2^i)!} \sim c_1 2^{2^{a+1} + c_2 a - \frac{a^2}4}=
-O(2^{2 n + c_2 \log_2 n- \frac{\log_2^2 n}4})=O(2^{2n})$$
+O(2^{3 n + c_2 \log_2 n- \frac{\log_2^2 n}4})=O(2^{3n})$$
 
 where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
 
@@ -397,13 +397,15 @@ where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
 	\subsection{Heuristics}
 		
 		A simple heuristic is to order the computers by a function of $w$, $\pi$ and $\varepsilon$ and possibly $A$. For example one can easily intuit $f(w, \pi, \varepsilon) = \frac{\pi\varepsilon}{w}$ to be interesting. This function indeed yield good results for small instance, but one can do better.
-		Let us consider one instance of the problem and two computers $(w_i,\pi_i,\varepsilon_i)$ and $(w_j,\pi_j,\varepsilon_j)$. We can decide easily if it's better to attack one computer before immediatly attacking the other.
+		Let us consider one instance of the problem and two computers $(w_i,\pi_i,\varepsilon_i)$ and $(w_j,\pi_j,\varepsilon_j)$. We can decide easily if it is better to attack one computer before immediatly attacking the other.
 		\begin{align*}
 			\Delta( \{ i, j, \cdots \}) - 	\Delta( \{ j, i, \cdots \}) &=  \frac{w_i}{A} + \varepsilon_i \frac{w_j}{A + \pi_i} + (1 - \varepsilon_i) \frac{w_j}{A} - \left ( \frac{w_j}{A} + \varepsilon_j \frac{w_i}{A + \pi_j} + (1 - \varepsilon_j ) \frac{w_i}{A} \right ) \\
 										&=   \varepsilon_i w_j \left ( \frac{1}{A + \pi_i} -\frac{1}{A} \right ) - \varepsilon_j w_i \left ( \frac{1}{A + \pi_j} -\frac{1}{A} \right )\\ 
-										&= \varepsilon_i w_j  \frac{pi_i}{A(A + \pi_i )} - \varepsilon_j w_i  \frac{pi_j}{A(A + \pi_j )} 
+										&= - \varepsilon_i w_j  \frac{\pi_i}{A(A + \pi_i )} + \varepsilon_j w_i  \frac{\pi_j}{A(A + \pi_j )} 
 		\end{align*}
-		Ordering pairs.
+		Thus it follows that : \[ \Delta( \{ i, j, \cdots \}) < \Delta( \{ j, i, \cdots \}) \Leftrightarrow \varepsilon_i w_j  \frac{\pi_i}{A + \pi_i} > \varepsilon_j w_i  \frac{\pi_j}{A + \pi_j} \Leftrightarrow \frac{\varepsilon_i \pi_i}{w_i(A + \pi_i)} >  \frac{\varepsilon_j \pi_j}{w_j(A + \pi_j)} \]
+		We can now order the computers according to the values (in decreasing order) of the function $f(A,w,\pi, \varepsilon) =\frac{\varepsilon \pi}{w(A + \pi)}$. Of course after the first step, we no longer have a fixed power, although we could take the mean of the values of $f$ on different branches. However keeping the initial power gives good approximation with the complexity of a sort.
+		This heuristics works well because we approximate a permutation of the computer which, albeit potentially suboptimal, is close to a permutation that is not improvable by any transposition of the form $(i\;\; i+1)$
 
 		Sampling paths.
 \section{An Experimental Observation}
