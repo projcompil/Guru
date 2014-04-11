@@ -414,6 +414,13 @@ let rec affiche = function
 						affiche l;
 					end;;
 
+(* m taille de l'instance
+   n nombre d'instances
+   resol fonction de résolution (exacte)
+   approx : approximation
+   calcul : calcul de l'espérance du temps
+   ferreur : fonction de coût
+*)
 let testeun m n resol approx calcul ferreur =
         let rec aux n acc = match n with
                 | 0 -> acc
