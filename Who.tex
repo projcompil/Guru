@@ -86,7 +86,7 @@ Ingenico\\
 1, rue Claude Chappe, {\sc bp 346}, {\sc f}-07503 Guilherand-Granges, France\\
 \email{eric.brier@ingenico.com}
 \and
-LIP6, CNRS et Université Pierre et Marie Curie\\
+LIP6, CNRS et Universitï¿½ Pierre et Marie Curie\\
 4 place Jussieu - BC 169
 {\sc f}-75252 Paris {\sc cedex 05}, France\\
 \email{eric.freyssinet@botnets.fr}
@@ -370,7 +370,25 @@ The evolution of $\Delta_{\mbox{{\tiny det}}}$ is irregular because $\Delta_{\mb
 	\subsubsection{Fixed powers}
 		Let's assume all $\pi_i$ are equal to $p$, then by sorting all computers according to $f(w,\varepsilon)=\frac{\varepsilon}{w}$ in decreasing order, we obtain the optimal solution. The complexity of this algorithm is obviously the complexity of an efficient sort, that is $O(n\log n)$.
 		\begin{proof}
-			
+We will suppose that the list of computer is sorted in decreasing order .
+
+Let $\sigma$ be a permutation different from identity.
+
+let $i=min(1 \leq j \leq n , \sigma (j) > \sigma (j+1))$ i exist because $\sigma$ is not identity.
+
+Then let $\omega$ such as $\omega = \sigma o (i,i+1)$ where $(i,i+1)$ represent the permutation of $i$ and $i+1$
+
+Let $T(\sigma)$ the average time of the attack in the order of $\sigma$ and $T(\omega)$ the time of the attack with $\omega$
+
+The only difference between trees of $\sigma$ and $\omega$ are branches at depth $i$ and $i+1$
+Then in all branches we have if A is the power at depth $i$ of this branch  ,$u= \sigma (i)$ and $v= \sigma (i+1)$:
+$ T(\sigma) - T(\omega)=\frac{w_{u}}A +\epsilon _{u}( \frac{w_{v}(A+1)) +(1- \epsilon _{u})(\frac{w_{v}A)- 
+\frac{w_{v}}A +\epsilon _{v}( \frac{w_{u}(A+1)) +(1- \epsilon _{v})(\frac{w_{u}A) = (\frac{-1}A(A+1))(\epsilon _{u}w_{v}-\epsilon _{v}w_{u}
+=w_{u}w_{v}(\frac{1}A(A+1))(\frac{\epsilon _{v}w_{v}-\frac{\epsilon _{u}w_{u})\req 0$
+because v< u
+
+So any order exept the decreasing one can be enhanced .Finally The decreasing order is the best.
+
 		\end{proof}
 	\subsubsection{All probabilities equal to 1}
 		If all the $\varepsilon_i$ are equal to $1$, then we are able to find the best solution in $O(n\log n)$, by a small modification of the merge sort. Given the power $A(t)$ at some step $t$ of the algorithm, we can compare two computers $x$ and $y$ by comparing $f(x,y) = f((w_x, p_x), (w_y, p_y)) = \frac{w_x}{A(t)} + \frac{w_y}{A(t) + p_y}$ and $f(y,x)$.
@@ -831,7 +849,7 @@ $\bigtriangleup_i \mbox{~for~}i\neq 1$&~:&~$\bigtriangleup_1$ as in Figure \ref{
 
 \bibitem{bot} http://searchsecurity.techtarget.com/definition/botnet
 
-\bibitem{bot2} M. Abu Rajab, J. Zarfoss, F. Monrose, A. Terzis, A multifaceted approach to understanding the botnet phenomenon, in Proceedings of the 6th ACM SIGCOMM conference on Internet measurement (IMC ’06)
+\bibitem{bot2} M. Abu Rajab, J. Zarfoss, F. Monrose, A. Terzis, A multifaceted approach to understanding the botnet phenomenon, in Proceedings of the 6th ACM SIGCOMM conference on Internet measurement (IMC ï¿½06)
 
 \end{thebibliography}
 
