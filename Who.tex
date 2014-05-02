@@ -374,18 +374,18 @@ We will suppose that the list of computer is sorted in decreasing order .
 
 Let $\sigma$ be a permutation different from identity.
 
-let $i=min(1 \leq j \leq n , \sigma (j) > \sigma (j+1))$ i exist because $\sigma$ is not identity.
+let $i= \min(1 \leq j \leq n , \sigma (j) > \sigma (j+1))$ i exist because $\sigma$ is not identity.
 
-Then let $\omega$ such as $\omega = \sigma o (i,i+1)$ where $(i,i+1)$ represent the permutation of $i$ and $i+1$
+Then let $\omega$ such as $\omega = \sigma \circ (i \;\; i+1)$ where $(i \;\; i+1)$ represent the permutation of $i$ and $i+1$
 
 Let $T(\sigma)$ the average time of the attack in the order of $\sigma$ and $T(\omega)$ the time of the attack with $\omega$
 
 The only difference between trees of $\sigma$ and $\omega$ are branches at depth $i$ and $i+1$
 Then in all branches we have if A is the power at depth $i$ of this branch  ,$u= \sigma (i)$ and $v= \sigma (i+1)$:
-$ T(\sigma) - T(\omega)=\frac{w_{u}}A +\epsilon _{u}( \frac{w_{v}(A+1)) +(1- \epsilon _{u})(\frac{w_{v}A)- 
-\frac{w_{v}}A +\epsilon _{v}( \frac{w_{u}(A+1)) +(1- \epsilon _{v})(\frac{w_{u}A) = (\frac{-1}A(A+1))(\epsilon _{u}w_{v}-\epsilon _{v}w_{u}
-=w_{u}w_{v}(\frac{1}A(A+1))(\frac{\epsilon _{v}w_{v}-\frac{\epsilon _{u}w_{u})\req 0$
-because v< u
+$ T(\sigma) - T(\omega)=\frac{w_u}{A} +\epsilon_u( \frac{w_v}{A+1} +(1- \epsilon_u)(\frac{w_v}{A})- 
+\frac{w_v}{A} +\epsilon_v( \frac{w_u}{A+1}) +(1- \epsilon_v)(\frac{w_u}{A} = (\frac{-1}{A(A+1)})(\epsilon_u w_v-\epsilon_v w_u
+=w_uw_v(\frac{1}{A(A+1)})(\frac{\epsilon_{v}}{w_v}-\frac{\epsilon_u}{w_u})\geq 0$
+because $v < u$
 
 So any order exept the decreasing one can be enhanced .Finally The decreasing order is the best.
 

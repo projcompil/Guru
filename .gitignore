@@ -15,9 +15,9 @@
 *.dvi
 *.pdf
 *.aux
-
+*.hi
 
 _build/
 guru
-
+hguru
 
