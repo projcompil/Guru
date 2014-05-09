@@ -390,8 +390,8 @@ because $v < u$
 So any order exept the decreasing one can be enhanced .Finally The decreasing order is the best.
 
 		\end{proof}
-	\subsubsection{All probabilities equal to 1}
-		If all the $\varepsilon_i$ are equal to $1$, then we are able to find the best solution in $O(n\log n)$, by a small modification of the merge sort. Given the power $A(t)$ at some step $t$ of the algorithm, we can compare two computers $x$ and $y$ by comparing $f(x,y) = f((w_x, p_x), (w_y, p_y)) = \frac{w_x}{A(t)} + \frac{w_y}{A(t) + p_y}$ and $f(y,x)$.
+%Cela ne marche pas.	\subsubsection{All probabilities equal to 1}
+%		If all the $\varepsilon_i$ are equal to $1$, then we are able to find the best solution in $O(n\log n)$, by a small modification of the merge sort. Given the power $A(t)$ at some step $t$ of the algorithm, we can compare two computers $x$ and $y$ by comparing $f(x,y) = f((w_x, p_x), (w_y, p_y)) = \frac{w_x}{A(t)} + \frac{w_y}{A(t) + p_y}$ and $f(y,x)$.
 \subsection{Computational Strategies}
 
 We did not find polynomial-time algorithms for computing $P_{\mbox{{\tiny op}}}$. However, as we will immediately see, the problem's complexity is (at most) exponential and not factorial.\smallskip
