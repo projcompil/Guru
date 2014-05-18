@@ -2,7 +2,7 @@ nw = 3000
 np = 1000
 
 function estime_moyenne(calcul, m, p, l)
-	(@parallel for i=1:m
+	(@parallel (+) for i=1:m
 		calcul(p,l)
 	end)/m
 end
