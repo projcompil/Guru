@@ -40,17 +40,40 @@ function naif(pi, w, p, eps)
 	const n = length(w)
 	const perms = permutations(1:n)
 	mini = Inf
+	pmini = zeros(Int64, n)
 	for sigma in perms
-		mini = min(calct(pi, w[sigma], p[sigma], eps[sigma]))
+		let c = calct(pi, w[sigma], p[sigma], eps[sigma])
+			if c < mini
+				mini = c
+				pmini = sigma
+			end
+		end
 	end
-	mini
+	mini, pmini
 end
 
 
-
-function heuris(pi, (w, p, eps))
-	eps * p / (w * (pi + p))
+function heuris(pi, ordi)
+	ordi[3] * ordi[2] / (ordi[1] * (pi + ordi[2]))
 end
 
 
+function appheur(pi, w, p, eps)
+	t = collect(zip(w, p, eps))
+	sort!(t, rev = true, by = (ordi-> (heuris(pi, ordi))))
+	t
+end
 
+function teste(m, n, resol, approx, calcul, ferreur)
+	1/n * @parallel (+) for i=1:n
+		pi = rand(1:np)
+		w, p, eps = genere(m)
+		optimal, lr = resol(pi, w, p, eps)
+		lt = approx(pi, w, p, eps)
+		for i=1:m
+			w[i], p[i], eps[i] = lt[i]
+		end
+		ct = calcul(pi, w, p, eps)
+		ferreur(ct/optimal -1)
+	end
+end
