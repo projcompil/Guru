@@ -66,6 +66,7 @@ function calcfinal(pi, w, p, eps)
 	aux(pi, 1)
 end
 
+
 function resout(pi, w, p, eps)
 	const n = length(w)
 	const r = div(n,2)
