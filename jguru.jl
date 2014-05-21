@@ -52,6 +52,25 @@ function naif(pi, w, p, eps)
 	mini, pmini
 end
 
+function calcfinal(pi, w, p, eps)
+	const n = length(w)
+	function aux(A, i)
+		if i > n
+			0.0
+		elseif i == n
+			w[i] / A
+		else
+			eps[i] * aux(A+p[i], i+1) + (1 - eps[i]) * aux(A, i+1)
+		end
+	end
+	aux(pi, 1)
+end
+
+function resout(pi, w, p, eps)
+	const n = length(w)
+	const r = div(n,2)
+	const combs = combinations(n, r)
+end
 
 function heuris(pi, ordi)
 	ordi[3] * ordi[2] / (ordi[1] * (pi + ordi[2]))
@@ -64,7 +83,7 @@ function appheur(pi, w, p, eps)
 	t
 end
 
-function teste(m, n, resol, approx, calcul, ferreur)
+function teste(m, n, approx, resol = naif, calcul = calct, ferreur = identity)
 	1/n * @parallel (+) for i=1:n
 		pi = rand(1:np)
 		w, p, eps = genere(m)
@@ -77,3 +96,4 @@ function teste(m, n, resol, approx, calcul, ferreur)
 		ferreur(ct/optimal -1)
 	end
 end
+
