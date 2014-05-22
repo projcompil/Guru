@@ -55,9 +55,7 @@ end
 function calcfinal(pi, w, p, eps)
 	const n = length(w)
 	function aux(A, i)
-		if i > n
-			0.0
-		elseif i == n
+		if i == n
 			w[i] / A
 		else
 			eps[i] * aux(A+p[i], i+1) + (1 - eps[i]) * aux(A, i+1)
@@ -67,10 +65,24 @@ function calcfinal(pi, w, p, eps)
 end
 
 
-function resout(pi, w, p, eps)
+function resout(pi, wd, pd, epsd, w, p, eps)
 	const n = length(w)
+	n == 0 && return 0., []
+	n == 1 && return calcfinal(pi, cat(1, wd, w), cat(1, pd, p), cat(1, epsd, eps)), (w, p, eps)
 	const r = div(n,2)
-	const combs = combinations(n, r)
+	const oppose = trues(n)
+	const combs = combinations(1:n, r)
+	mini = (Inf, [])
+	for c in combs
+		fill!(t, true)
+		oppose[c] = false
+		wl, pl, epsl = w[c], p[c], eps[c]
+		wr, pr, epsr = w[oppose], p[oppose], eps[oppose]
+		rd, rld = resout(pi, wd, pd, epsd, wl, pl, epsl)
+		rf, rlf = resout(pi, cat(1, wd, wl), cat(1, pd, pl), cat(1, epsd, epsl), wr, pr, epsr)
+		mini = min((rd + rf, cat(1, rld, rlf)), mini)
+	end
+	mini
 end
 
 function heuris(pi, ordi)
