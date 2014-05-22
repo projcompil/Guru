@@ -71,8 +71,8 @@ end
 
 function resout(pi, wd, pd, epsd, w, p, eps)
 	const n = length(w)
-	n == 0 && return 0., []
-	n == 1 && return calcfinal(pi, cat(1, wd, w), cat(1, pd, p), cat(1, epsd, eps)), (w, p, eps)
+	n == 0 && return 0., ([], [], [])
+	n == 1 && return calcfinal(pi, cat(1, wd, w), cat(1, pd, p), cat(1, epsd, eps)), (w [1], p[1], eps[1])
 	const r = div(n,2)
 	const oppose = trues(n)
 	const combs = combinations(1:n, r)
@@ -84,14 +84,18 @@ function resout(pi, wd, pd, epsd, w, p, eps)
 		wr, pr, epsr = w[oppose], p[oppose], eps[oppose]
 		rd, rld = resout(pi, wd, pd, epsd, wl, pl, epsl)
 		rf, rlf = resout(pi, cat(1, wd, wl), cat(1, pd, pl), cat(1, epsd, epsl), wr, pr, epsr)
-		mini = min((rd + rf, cat(1, rld, rlf)), mini)
+		w1, p1, eps1 = rld
+		w2, p2, eps2 = rlf
+		if rd + rf < mini[1]
+			mini = (rd + rf, (cat(1, w1, w2), cat(1, p1, p2), cat(1, eps1, eps2)))
+		end
 	end
 	mini
 end
 
 exact(pi, w, p, eps) = resout(pi, [], [], [], w, p, eps)
 
-rexact(pi, w, p, eps) = exact(pi, w, p, eps)[1]
+rexact(pi, w, p, eps) = exact(pi, w, p, eps)[2]
 
 function heuris(pi, ordi)
 	ordi[3] * ordi[2] / (ordi[1] * (pi + ordi[2]))
@@ -99,20 +103,31 @@ end
 
 
 function appheur(pi, w, p, eps)
+	const n = length(w)
 	t = collect(zip(w, p, eps))
 	sort!(t, rev = true, by = (ordi-> (heuris(pi, ordi))))
-	t
+	wr, pr, epsr = zero(w), zero(p), zero(eps)
+	for i=1:n
+		wr[i], pr[i], epsr[i] = t[i]
+	end
+	wr, pr, epsr
 end
 
 function teste(m, n, approx, resol = naif, calcul = calct, ferreur = identity)
 	1/n * @parallel (+) for i=1:n
 		pi = rand(1:np)
 		w, p, eps = genere(m)
+		show(w)
+		show(p)
+		show(eps)
 		optimal, lr = resol(pi, w, p, eps)
 		lt = approx(pi, w, p, eps)
-		for i=1:m
-			w[i], p[i], eps[i] = lt[i]
-		end
+		println("Tout se passe bien : $(typeof(lt))")
+		w, p, eps = lt[1], lt[2], lt[3]
+		println("Tout se passe bien : $(typeof(p))")
+		show(w)
+		show(p)
+		show(eps)
 		ct = calcul(pi, w, p, eps)
 		ferreur(ct/optimal -1)
 	end
