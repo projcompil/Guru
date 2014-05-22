@@ -113,21 +113,13 @@ function appheur(pi, w, p, eps)
 	wr, pr, epsr
 end
 
-function teste(m, n, approx, resol = naif, calcul = calct, ferreur = identity)
+function teste(m, n, approx, resol = exact, calcul = calct, ferreur = identity)
 	1/n * @parallel (+) for i=1:n
 		pi = rand(1:np)
 		w, p, eps = genere(m)
-		show(w)
-		show(p)
-		show(eps)
 		optimal, lr = resol(pi, w, p, eps)
 		lt = approx(pi, w, p, eps)
-		println("Tout se passe bien : $(typeof(lt))")
 		w, p, eps = lt[1], lt[2], lt[3]
-		println("Tout se passe bien : $(typeof(p))")
-		show(w)
-		show(p)
-		show(eps)
 		ct = calcul(pi, w, p, eps)
 		ferreur(ct/optimal -1)
 	end
@@ -137,4 +129,3 @@ end
 end
 
 
-@time println("Résultat : $(Guru.teste(5, 10, Guru.rexact))")
