@@ -1,3 +1,7 @@
+
+module Guru
+
+
 nw = 3000
 np = 1000
 
@@ -74,7 +78,7 @@ function resout(pi, wd, pd, epsd, w, p, eps)
 	const combs = combinations(1:n, r)
 	mini = (Inf, [])
 	for c in combs
-		fill!(t, true)
+		fill!(oppose, true)
 		oppose[c] = false
 		wl, pl, epsl = w[c], p[c], eps[c]
 		wr, pr, epsr = w[oppose], p[oppose], eps[oppose]
@@ -84,6 +88,10 @@ function resout(pi, wd, pd, epsd, w, p, eps)
 	end
 	mini
 end
+
+exact(pi, w, p, eps) = resout(pi, [], [], [], w, p, eps)
+
+rexact(pi, w, p, eps) = exact(pi, w, p, eps)[1]
 
 function heuris(pi, ordi)
 	ordi[3] * ordi[2] / (ordi[1] * (pi + ordi[2]))
@@ -110,3 +118,8 @@ function teste(m, n, approx, resol = naif, calcul = calct, ferreur = identity)
 	end
 end
 
+
+end
+
+
+@time println("Résultat : $(Guru.teste(5, 10, Guru.rexact))")
