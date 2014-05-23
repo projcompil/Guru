@@ -466,11 +466,11 @@ let taille = (Array.length Sys.argv) -1 in
         else if taille = 2 then
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
-                        Printf.printf "En pourcentage : %F\n" (100. *.
+                        Printf.printf  "%F,%d,%d\n" (
                         (testeun m n  (resout) (*fun l p -> solheur l p 1. 1.
                         1.*) (*fun l p -> snd(resout l p)*) (*fun l p -> trig
                         calcfin l p*) (triheur1 1. 1. 1.) (*trig
-                        (estime_moyenne calcfin_alea (m*m))*) (*trid*) calct identite)/. float_of_int(n))
+                        (estime_moyenne calcfin_alea (m*m))*) (*trid*) calct identite)/. float_of_int(n)) m n
 
 
 	else if taille = 5 || taille = 8 then
