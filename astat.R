@@ -17,7 +17,7 @@ X11()
 plot(x$n, x$errorate)
 temp <- data.frame(y = x[,1], x = x[,2])
 # fit non-linear model
-mod <- nls(y ~ exp(a + b * x), data = temp, start = list(a = 0, b = 0))
+mod <- nls(y ~ tanh(a + b * x), data = temp, start = list(a = 0, b = 0))
 #
 coef = coef(mod)
 
