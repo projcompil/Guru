@@ -36,6 +36,7 @@
 \newcommand{\atk}{\begin{turn}{130}{\scriptsize \Lightning}\end{turn}}
 \newcommand{\qm}{\raisebox{0.5ex}{\tiny ?}}
 \newcommand{\tk}{\raisebox{1ex}{\atk}}
+\newcommand{\ep}{\varepsilon}
 \newcommand{\VV}[2]{\begin{tabular}{ll}
 \tk&$\mathcal{V}_{#1}$\\
 {\scriptsize \StopWatchEnd}& #2
@@ -79,7 +80,7 @@
 
 \title{Cascade {\sl Cryptanalysis} {\it Exemple}}
 
-\author{Eric Brier\inst{1} \and Eric Freysinnet\inst{2} \and David Naccache\inst{3}}
+\author{Eric Brier\inst{1} \and Eric Freysinnet\inst{2} \and David Naccache\inst{3} \and Maxime Legrand\inst{3}  \and Thomas Magnard\inst{3} \and Marc Pasqualetto \inst{3} \and Nissim Zerbib\inst{3}}
 
 \institute{%
 Ingenico\\
@@ -94,7 +95,7 @@ LIP6, CNRS et Universit� Pierre et Marie Curie\\
 \'Ecole normale sup\'erieure\\
 \'Equipe de cryptographie,
 45 rue d'Ulm, {\sc f}-75230 Paris {\sc cedex 05}, France\\
-\email{david.naccache@ens.fr}
+\email{david.naccache@ens.fr, legrand.maxime@ens.fr, thomas.magnard@ens.fr,  marc.pasqualetto@ens.fr,  nissim.zerbib@ens.fr}
 }
 
 \maketitle
@@ -773,6 +774,30 @@ For $n=3$ adaptive attacks are not characterized by a permutation but by the $\m
 \caption{The $1,\bullet,\bullet$ scenario (note that the order of attacks in the branches is reversed).}
 \label{fut1}
 \end{figure}
+
+
+We have
+\begin{align}
+	\frac{\ep_2\pi_2}{w_2}(A+\pi_1+\pi_3) &> \frac{\ep_3\pi_3}{w_3}(A+\pi_1+\pi_2)\\
+	\frac{\ep_2\pi_2}{w_2}(A+\pi_3) &> \frac{\ep_3\pi_3}{w_3}(A+\pi_2)
+\end{align}
+It follows that : 
+\begin{align*}
+	-\frac{\ep_2\pi_2}{w_2}(A+\pi_3) &< -\frac{\ep_3\pi_3}{w_3}(A+\pi_2)\\
+	\frac{\ep_2\pi_2}{w_2}\pi_1 &< \frac{\ep_3\pi_3}{w_3}\pi_1\\
+	\frac{\ep_2\pi_2}{w_2} &< \frac{\ep_3\pi_3}{w_3}\\
+	-A\frac{\ep_2\pi_2}{w_2} &> -A\frac{\ep_3\pi_3}{w_3}\\
+	\frac{\ep_2\pi_2}{w_2}\pi_3 &> \frac{\ep_3\pi_3}{w_3}\pi_2
+\end{align*}
+Finally :
+\begin{align}
+	\frac{\ep_2}{w_2} &> \frac{\ep_3}{w_3}\\
+	\frac{\ep_2\pi_2}{w_2} &< \frac{\ep_3\pi_3}{w_3}
+\end{align}
+We can sum up :
+\begin{align*}
+	\frac{\ep_2\pi_2}{w_2\pi_3} <  \frac{\ep_3}{w_3} < \frac{\ep_2}{w_2}
+\end{align*}
 
 
 The general algorithm is illustrated in Figures \ref{star} and \ref{dig1}. Assume again that we know (thanks to some oracle) that an adaptive attack for $n=4$ should start by $\mathcal{V}_1$. Figure \ref{dig1} shows the 4 possible attack plans starting by an attack on $\mathcal{V}_1$.\smallskip
