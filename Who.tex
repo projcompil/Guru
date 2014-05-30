@@ -395,6 +395,38 @@ So any order exept the decreasing one can be enhanced .Finally The decreasing or
 %		If all the $\varepsilon_i$ are equal to $1$, then we are able to find the best solution in $O(n\log n)$, by a small modification of the merge sort. Given the power $A(t)$ at some step $t$ of the algorithm, we can compare two computers $x$ and $y$ by comparing $f(x,y) = f((w_x, p_x), (w_y, p_y)) = \frac{w_x}{A(t)} + \frac{w_y}{A(t) + p_y}$ and $f(y,x)$.
 \subsection{Computational Strategies}
 
+%Recurrenceformule
+We begin with the following formula :
+\[
+	T(2n, r) = \frac{2n!}{n!^2}(T(n, r)+T(n, r+n))
+\]
+\[
+	T(2n+1, r) = \frac{2(n+1)!}{(n+1)!n!}(T(n+1, r)+T(n, r+n+1))
+\]
+\[
+	T(1, r) = 2^r
+\]
+
+We assume $\exists K > 0, \forall n \geqslant 16, \forall r \in \mathbb{N}, T(n, r) \leqslant K(2^{3n+r})$, thereby :
+\[
+	T(2n, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3n+r}+2^{3n+n+r})
+\]
+also
+\[
+	T(2n+1, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3(n+1)+r}+2^{3n+n+r+1})
+\]
+thus
+\[
+	T(2n, r) \leqslant \frac{2}{\sqrt{n\pi}}K2^{3(2n)+r} \leqslant K2^{3(2n)+r}
+\]
+\[
+	T(2n+1, r) \leqslant \frac{4}{\sqrt{n\pi}}K2^{3(2n)+r} \leqslant K2^{3(2n)+r}
+\]
+Furthermore it remains true for $n \leqslant 15$, donc par récurrence sur n, on a bien
+\[
+	\boxed{ \exists K > 0, \forall n \in \mathbb{N}, \forall r \in \mathbb{N}, T(n, r) \leqslant K(2^{3n+r}) }
+\]
+
 We did not find polynomial-time algorithms for computing $P_{\mbox{{\tiny op}}}$. However, as we will immediately see, the problem's complexity is (at most) exponential and not factorial.\smallskip
 
 We first note that the computation of $P_{\mbox{{\tiny op}}}$ can be accelerated (by a constant factor) using early aborts\footnote{{\sl e.g.} start by recording $\Delta_{\mbox{{\tiny det}}}(P_0)$ as a best score and begin computing $\Delta_{\mbox{{\tiny det}}}(P_1)$. As soon as the summation of terms in $\Delta_{\mbox{{\tiny det}}}(P_1)$ exceeds $\Delta_{\mbox{{\tiny det}}}(P_0)$ stop and try $P_2$ etc} and by smartly recycling for $P_{i+1}$ computations performed for computing $P_i$.\smallskip
@@ -776,18 +808,19 @@ For $n=3$ adaptive attacks are not characterized by a permutation but by the $\m
 \end{figure}
 
 
+
 We have
 \begin{align}
 	\frac{\ep_2\pi_2}{w_2}(A+\pi_1+\pi_3) &> \frac{\ep_3\pi_3}{w_3}(A+\pi_1+\pi_2)\\
-	\frac{\ep_2\pi_2}{w_2}(A+\pi_3) &> \frac{\ep_3\pi_3}{w_3}(A+\pi_2)
+	\frac{\ep_2\pi_2}{w_2}(A+\pi_3) &< \frac{\ep_3\pi_3}{w_3}(A+\pi_2)
 \end{align}
 It follows that : 
 \begin{align*}
-	-\frac{\ep_2\pi_2}{w_2}(A+\pi_3) &< -\frac{\ep_3\pi_3}{w_3}(A+\pi_2)\\
-	\frac{\ep_2\pi_2}{w_2}\pi_1 &< \frac{\ep_3\pi_3}{w_3}\pi_1\\
-	\frac{\ep_2\pi_2}{w_2} &< \frac{\ep_3\pi_3}{w_3}\\
-	-A\frac{\ep_2\pi_2}{w_2} &> -A\frac{\ep_3\pi_3}{w_3}\\
-	\frac{\ep_2\pi_2}{w_2}\pi_3 &> \frac{\ep_3\pi_3}{w_3}\pi_2
+	-\frac{\ep_2\pi_2}{w_2}(A+\pi_3) &> -\frac{\ep_3\pi_3}{w_3}(A+\pi_2)\\
+	\frac{\ep_2\pi_2}{w_2}\pi_1 &> \frac{\ep_3\pi_3}{w_3}\pi_1\\
+	\frac{\ep_2\pi_2}{w_2} &> \frac{\ep_3\pi_3}{w_3}\\
+	-A\frac{\ep_2\pi_2}{w_2} &< -A\frac{\ep_3\pi_3}{w_3}\\
+	\frac{\ep_2\pi_2}{w_2}\pi_3 &< \frac{\ep_3\pi_3}{w_3}\pi_2
 \end{align*}
 Finally :
 \begin{align}
@@ -796,9 +829,10 @@ Finally :
 \end{align}
 We can sum up :
 \begin{align*}
-	\frac{\ep_2\pi_2}{w_2\pi_3} <  \frac{\ep_3}{w_3} < \frac{\ep_2}{w_2}
+	\frac{\ep_2\pi_2}{w_2\pi_3} >  \frac{\ep_3}{w_3} > \frac{\ep_2}{w_2}
 \end{align*}
 
+There is no dependency on $\pi_1$ because when only two computers are left, the current power 
 
 The general algorithm is illustrated in Figures \ref{star} and \ref{dig1}. Assume again that we know (thanks to some oracle) that an adaptive attack for $n=4$ should start by $\mathcal{V}_1$. Figure \ref{dig1} shows the 4 possible attack plans starting by an attack on $\mathcal{V}_1$.\smallskip
 
