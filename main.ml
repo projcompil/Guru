@@ -218,7 +218,7 @@ let trie calcm liste pi =
 
 let sole calcm l pi =
 	let lr = trie calcm l pi in
-		(calct pi l), lr
+		(calct pi lr), lr
 
 (*
 let rec divise = function
@@ -431,15 +431,15 @@ let testeun m n resol approx calcul ferreur =
                                 let optimal,lr = (resol l p) in
                                         let lt = approx l p in
                                         let ct = calcul p lt in
-                                               	(*if ct > optimal +. 1e-10 then
+                                               	(*if ct < optimal +. 1e-10 then
 							begin
                                                         print_endline("Optimal :");
 							affiche lr;
                                                         print_endline("Approx :");
 							affiche lt;
 							Printf.printf "\n%F  ::: %F pourcent de différence\n"  (ct -. optimal) (100. *.(ct /. optimal -. 1.));
-							end;
-						*)
+							end;*)
+						
 						aux (n-1) (acc +. ferreur(ct /. optimal -. 1.))
         in aux n 0.;;
 
@@ -467,7 +467,7 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf  "%F,%d,%d\n" (
-                        (testeun m n  (resout) (*fun l p -> solheur l p 1. 1.
+                        (testeun m n  (*resout*) (sole calcfin) (*fun l p -> solheur l p 1. 1.
                         1.*) (*fun l p -> snd(resout l p)*) (*fun l p -> trig
                         calcfin l p*) (triheur1 1. 1. 1.) (*trig
                         (estime_moyenne calcfin_alea (m*m))*) (*trid*) calct identite)/. float_of_int(n)) m n
