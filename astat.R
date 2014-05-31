@@ -53,8 +53,10 @@ curve(func, from = 0, to = 100, n = 100001, add=TRUE, col="red")
 #lines(temp$x, predict(mod, list(x = temp$x)))
 }, finally = {
 
+
+setEPS();
 if(!is.null(opt$save)) {
-	dev.copy(pdf, opt$save)
+	dev.copy(postscript, opt$save)
 	dev.off()
 }
 message("Press Return To Continue")
