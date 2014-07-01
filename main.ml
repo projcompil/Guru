@@ -467,9 +467,9 @@ let taille = (Array.length Sys.argv) -1 in
                 let n = int_of_string Sys.argv.(2) in
 		let m = int_of_string Sys.argv.(1) in
                         Printf.printf  "%F,%d,%d\n" (
-                        (testeun m n  (resout) (trie  calcfin) (*fun l p -> solheur l p 1. 1.
+                        (testeun m n  (resout) (*trie  calcfin*) (*fun l p -> solheur l p 1. 1.
                         1.*) (*fun l p -> snd(resout l p)*) (*fun l p -> trig
-                        calcfin l p*) (*triheur1 1. 1. 1.*) (*trig
+                        calcfin l p*) (triheur1 1. 1. 1.) (*trig
                         (estime_moyenne calcfin_alea (m*m))*) (*trid*) calct identite)/. float_of_int(n)) m n
 
 
