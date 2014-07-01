@@ -396,6 +396,16 @@ So any order exept the decreasing one can be enhanced .Finally The decreasing or
 \subsection{Computational Strategies}
 
 %Recurrenceformule
+
+
+We did not find polynomial-time algorithms for computing $P_{\mbox{{\tiny op}}}$. However, as we will immediately see, the problem's complexity is (at most) exponential and not factorial.\smallskip
+
+We first note that the computation of $P_{\mbox{{\tiny op}}}$ can be accelerated (by a constant factor) using early aborts\footnote{{\sl e.g.} start by recording $\Delta_{\mbox{{\tiny det}}}(P_0)$ as a best score and begin computing $\Delta_{\mbox{{\tiny det}}}(P_1)$. As soon as the summation of terms in $\Delta_{\mbox{{\tiny det}}}(P_1)$ exceeds $\Delta_{\mbox{{\tiny det}}}(P_0)$ stop and try $P_2$ etc} and by smartly recycling for $P_{i+1}$ computations performed for computing $P_i$.\smallskip
+
+Also, if $P=\{P(1),\ldots,P(n-1),P(n)\}$ and $P'=\{P(1),\ldots,P(n-2),P(n),P(n-1)\}$ we observe that the common prefix $\{P(1),\ldots,P(n-2)\}$ can serve for the computation of both $\Delta_{\mbox{{\tiny det}}}(P)$ and $\Delta_{\mbox{{\tiny det}}}(P')$. Pushing this observation further, we get a divide and conquer algorithm: \smallskip
+
+Let $n=2k$ and let $P_{\mbox{{\tiny op}}}^{2k}$ be the optimal plan for attacking $\mathcal{V}_1,\ldots,\mathcal{V}_{2k}$. Given the (unordered) list $\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(1)},\ldots,\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(k)}$ we can compute the (ordered) prefix $\{P_{\mbox{{\tiny op}}}^{2k}(1),\ldots,P_{\mbox{{\tiny op}}}^{2k}(k)\}$ of $P_{\mbox{{\tiny op}}}^{2k}$ without examining $\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(k+1)},\ldots,\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(2k)}$, {\sl i.e.} $\Delta_{\mbox{{\tiny det}}}(P_{\mbox{{\tiny op}}}^{2k})$ can be computed by generating and solving all $\binom{2k}{k}$ sub-problem pairs of size $k$.\smallskip
+
 We begin with the following formula :
 \[
 	T(2n, r) = \frac{2n!}{n!^2}(T(n, r)+T(n, r+n))
@@ -422,30 +432,24 @@ thus
 \[
 	T(2n+1, r) \leqslant \frac{4}{\sqrt{n\pi}}K2^{3(2n)+r} \leqslant K2^{3(2n)+r}
 \]
-Furthermore it remains true for $n \leqslant 15$, donc par récurrence sur n, on a bien
+Furthermore it remains true for $n \leqslant 15$, thus by induction : 
 \[
-	\boxed{ \exists K > 0, \forall n \in \mathbb{N}, \forall r \in \mathbb{N}, T(n, r) \leqslant K(2^{3n+r}) }
+	 \exists K > 0, \forall n \in \mathbb{N}, \forall r \in \mathbb{N}, T(n, r) \leqslant K 2^{3n+r}
 \]
 
-We did not find polynomial-time algorithms for computing $P_{\mbox{{\tiny op}}}$. However, as we will immediately see, the problem's complexity is (at most) exponential and not factorial.\smallskip
+In other words, if the cost of finding $P_{\mbox{{\tiny op}}}^{2k}$ is $O(2^{3n})$.
 
-We first note that the computation of $P_{\mbox{{\tiny op}}}$ can be accelerated (by a constant factor) using early aborts\footnote{{\sl e.g.} start by recording $\Delta_{\mbox{{\tiny det}}}(P_0)$ as a best score and begin computing $\Delta_{\mbox{{\tiny det}}}(P_1)$. As soon as the summation of terms in $\Delta_{\mbox{{\tiny det}}}(P_1)$ exceeds $\Delta_{\mbox{{\tiny det}}}(P_0)$ stop and try $P_2$ etc} and by smartly recycling for $P_{i+1}$ computations performed for computing $P_i$.\smallskip
 
-Also, if $P=\{P(1),\ldots,P(n-1),P(n)\}$ and $P'=\{P(1),\ldots,P(n-2),P(n),P(n-1)\}$ we observe that the common prefix $\{P(1),\ldots,P(n-2)\}$ can serve for the computation of both $\Delta_{\mbox{{\tiny det}}}(P)$ and $\Delta_{\mbox{{\tiny det}}}(P')$. Pushing this observation further, we get a divide and conquer algorithm: \smallskip
 
-Let $n=2k$ and let $P_{\mbox{{\tiny op}}}^{2k}$ be the optimal plan for attacking $\mathcal{V}_1,\ldots,\mathcal{V}_{2k}$. Given the (unordered) list $\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(1)},\ldots,\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(k)}$ we can compute the (ordered) prefix $\{P_{\mbox{{\tiny op}}}^{2k}(1),\ldots,P_{\mbox{{\tiny op}}}^{2k}(k)\}$ of $P_{\mbox{{\tiny op}}}^{2k}$ without examining $\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(k+1)},\ldots,\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(2k)}$, {\sl i.e.} $\Delta_{\mbox{{\tiny det}}}(P_{\mbox{{\tiny op}}}^{2k})$ can be computed by generating and solving all $\binom{2k}{k}$ sub-problem pairs of size $k$.\smallskip
+%$$f(n)= \binom{n}{n/2} \times (1+2^{n/2}) f(\frac{n}2)%
+%= \frac{2^a n! f(1)}{\prod_{i=1}^{a-1}(2^i)!} \sim c_1 2^{2^{a+1} + c_2 a - \frac{a^2}4}=
+%O(2^{3 n + c_2 \log_2 n- \frac{\log_2^2 n}4})=O(2^{3n})$$
 
-In other words, if the cost of finding $P_{\mbox{{\tiny op}}}^{2k}$ is $f(n)$ then, denoting $n=2^a$:
-
-$$f(n)= \binom{n}{n/2} \times (1+2^{n/2}) f(\frac{n}2)
-= \frac{2^a n! f(1)}{\prod_{i=1}^{a-1}(2^i)!} \sim c_1 2^{2^{a+1} + c_2 a - \frac{a^2}4}=
-O(2^{3 n + c_2 \log_2 n- \frac{\log_2^2 n}4})=O(2^{3n})$$
-
-where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
+%where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
 
 
 	\subsection{Heuristics}
-		
+		\subsubsection{Algorithms}		
 		A simple heuristic is to order the computers by a function of $w$, $\pi$ and $\varepsilon$ and possibly $A$. For example one can easily intuit $f(w, \pi, \varepsilon) = \frac{\pi\varepsilon}{w}$ to be interesting. This function indeed yields good results for small instance, but one can do better.
 		Let us consider one instance of the problem and two computers $(w_i,\pi_i,\varepsilon_i)$ and $(w_j,\pi_j,\varepsilon_j)$. We can decide easily if it is better to attack one computer before immediately attacking the other.
 		\begin{align*}
@@ -461,6 +465,23 @@ where: $$c_1=\frac{f(1)\pi^2}{e^2}\mbox{~~and~~}c_2=\frac{5-2\log_2 \pi}4$$
 		Actually it is possible to obtain a permutation of the computers that can't be improved by any transposition of the form  $(i\;\; i+1)$, at the price of an increased complexity of $O(2^n)$. This highlights the difficulty of the problem, as it is possible to find instances where such an algorithm is stuck in a suboptimal solution.
 		
 		A simple way to achieve an approximation of the last algorithm, which is polynomial in time, is to take the mean across sampled paths.
+		
+		\subsubsection{Performance}
+		
+		\begin{figure}
+		\includegraphics{boxexheur.jpg} %{comparaison_regles_pool5_a2c4l512e2}
+		\caption{Error of the heuristic compared to the optimal}
+		\end{figure}
+		
+		\begin{figure}
+		\includegraphics{boxpexheur.pdf} %{comparaison_regles_pool5_a2c4l512e2}
+		\caption{Error of the heuristic compared to greedily ordering pairs.}
+		\end{figure}
+		
+		\begin{figure}
+		\includegraphics{bpxpexex.pdf} %{comparaison_regles_pool5_a2c4l512e2}
+		\caption{Error of the the greedy algorithm compared to the optimal.}
+		\end{figure}
 \section{An Experimental Observation}
 
 Can a $P_{\mbox{{\tiny op}}}^{n+1}$ be constructed by inserting $\mathcal{V}_{n+1}$ into $P_{\mbox{{\tiny op}}}^n$? It appears that such is frequently the case. This section provides experimental statistics about the ratio of configurations for which the insertion of $\mathcal{V}_5$ and $\mathcal{V}_6$ into a 4-target solution is possible.

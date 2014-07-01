@@ -13,7 +13,6 @@
 *.*~
 *.log
 *.dvi
-*.pdf
 *.aux
 *.hi
 
@@ -21,4 +20,3 @@ _build/
 guru
 hguru
 .DS_Store
-*.pdf
