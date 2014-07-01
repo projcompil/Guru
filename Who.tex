@@ -830,9 +830,11 @@ For $n=3$ adaptive attacks are not characterized by a permutation but by the $\m
 
 
 
-We have
+Suppose we change of future target if the current one is acquired or not. Mathematically :
 \begin{align}
+\label{unf}
 	\frac{\ep_2\pi_2}{w_2}(A+\pi_1+\pi_3) &> \frac{\ep_3\pi_3}{w_3}(A+\pi_1+\pi_2)\\
+	\label{deuxf}
 	\frac{\ep_2\pi_2}{w_2}(A+\pi_3) &< \frac{\ep_3\pi_3}{w_3}(A+\pi_2)
 \end{align}
 It follows that : 
@@ -848,12 +850,17 @@ Finally :
 	\frac{\ep_2}{w_2} &> \frac{\ep_3}{w_3}\\
 	\frac{\ep_2\pi_2}{w_2} &< \frac{\ep_3\pi_3}{w_3}
 \end{align}
-We can sum up :
-\begin{align*}
+We can sum up this as :
+\begin{align}
+\label{inegf}
 	\frac{\ep_2\pi_2}{w_2\pi_3} >  \frac{\ep_3}{w_3} > \frac{\ep_2}{w_2}
-\end{align*}
+\end{align}
 
-There is no dependency on $\pi_1$ because when only two computers are left, the current power 
+Conversely, if (\ref{inegf}) holds, it follows that \ref{unf} and \ref{deuxf} are true, as can be shown easily.
+
+There is no dependency on $\pi_1$ because when only two computers are left, the current power .
+
+Hence such examples of adaptative attacks being better than the generic one can be generated with great ease.
 
 The general algorithm is illustrated in Figures \ref{star} and \ref{dig1}. Assume again that we know (thanks to some oracle) that an adaptive attack for $n=4$ should start by $\mathcal{V}_1$. Figure \ref{dig1} shows the 4 possible attack plans starting by an attack on $\mathcal{V}_1$.\smallskip
 
