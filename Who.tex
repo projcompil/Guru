@@ -406,7 +406,7 @@ Also, if $P=\{P(1),\ldots,P(n-1),P(n)\}$ and $P'=\{P(1),\ldots,P(n-2),P(n),P(n-1
 
 Let $n=2k$ and let $P_{\mbox{{\tiny op}}}^{2k}$ be the optimal plan for attacking $\mathcal{V}_1,\ldots,\mathcal{V}_{2k}$. Given the (unordered) list $\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(1)},\ldots,\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(k)}$ we can compute the (ordered) prefix $\{P_{\mbox{{\tiny op}}}^{2k}(1),\ldots,P_{\mbox{{\tiny op}}}^{2k}(k)\}$ of $P_{\mbox{{\tiny op}}}^{2k}$ without examining $\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(k+1)},\ldots,\mathcal{V}_{P_{\mbox{{\tiny op}}}^{2k}(2k)}$, {\sl i.e.} $\Delta_{\mbox{{\tiny det}}}(P_{\mbox{{\tiny op}}}^{2k})$ can be computed by generating and solving all $\binom{2k}{k}$ sub-problem pairs of size $k$.\smallskip
 
-We begin with the following formula :
+We begin with the following formula, representing the complexity of the attack :
 \[
 	T(2n, r) = \frac{2n!}{n!^2}(T(n, r)+T(n, r+n))
 \]
@@ -418,26 +418,41 @@ We begin with the following formula :
 \]
 
 We assume $\exists K > 0, \forall n \geqslant 16, \forall r \in \mathbb{N}, T(n, r) \leqslant K(2^{3n+r})$, thereby :
+%\[
+%	T(2n, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3n+r}+2^{3n+n+r})
+%\]
+%also
+%\[
+%	T(2n+1, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3(n+1)+r}+2^{3n+n+r+1})
+%\]
+%thus
+%\[
+%	T(2n, r) \leqslant \frac{2}{\sqrt{n\pi}}K2^{3(2n)+r} \leqslant K2^{3(2n)+r}
+%\]
+%\[
+%	T(2n+1, r) \leqslant \frac{4}{\sqrt{n\pi}}K2^{3(2n)+r} \leqslant K2^{3(2n)+r}
+%\]
+We assume $\exists K > 0, \forall n \geqslant 82, \forall r \in \mathbb{N}, T(n, r) \leqslant K(2^{3n+r- log_{2} (n)})$, thereby :
 \[
-	T(2n, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3n+r}+2^{3n+n+r})
+T(2n, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3n+r-log_{2} (n)}+2^{3n+n+r- log_{2} (n)})
 \]
 also
 \[
-	T(2n+1, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3(n+1)+r}+2^{3n+n+r+1})
+T(2n+1, r) \leqslant \frac{4^n}{\sqrt{n\pi}}K(2^{3(n+1)+r- log_{2} (n)}+2^{3n+n+r+1- log_{2} (n)})
 \]
 thus
 \[
-	T(2n, r) \leqslant \frac{2}{\sqrt{n\pi}}K2^{3(2n)+r} \leqslant K2^{3(2n)+r}
+T(2n, r) \leqslant \frac{2}{\sqrt{n\pi}}K2^{3(2n)+r- log_{2} (n)} \leqslant K2^{3(2n)+r- log_{2} (2n)+3 - \frac{log_{2}(n\pi)}{2}} \leqslant K2^{3(2n)+r-log_{2} (2n)}
 \]
 \[
-	T(2n+1, r) \leqslant \frac{4}{\sqrt{n\pi}}K2^{3(2n)+r} \leqslant K2^{3(2n)+r}
+T(2n+1, r) \leqslant \frac{4}{\sqrt{n\pi}}K2^{3(2n+1)+r-log_{2} (n)+1} \leqslant K2^{3(2n+1)+r-log_{2} (2n) +4 -\frac{log_{2}(n\pi)}{2}} \leqslant K2^{3(2n+1)+r- log_{2}(2n+1)}
 \]
 Furthermore it remains true for $n \leqslant 15$, thus by induction : 
 \[
-	 \exists K > 0, \forall n \in \mathbb{N}, \forall r \in \mathbb{N}, T(n, r) \leqslant K 2^{3n+r}
+	 \exists K > 0, \forall n \in \mathbb{N}, \forall r \in \mathbb{N}, T(n, r) \leqslant K \frac{2^{3n+r}}{n}
 \]
 
-In other words, if the cost of finding $P_{\mbox{{\tiny op}}}^{2k}$ is $O(2^{3n})$.
+In other words, if the cost of finding $P_{\mbox{{\tiny op}}}^{n}$ is $O(\frac{2^{3n}}{n})$.
 
 
 
