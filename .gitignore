@@ -8,7 +8,7 @@
 *.cmxs
 *.cmxa
 *.native
-
+*.gz
 *.swp
 *.*~
 *.log
